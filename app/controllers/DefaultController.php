@@ -2,6 +2,6 @@
 class DefaultController
 {
 public function index(){
-echo "HELLO HUTECH ";
+include 'app/views/home.php';
 }
 }

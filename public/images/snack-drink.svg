@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="Snack drink">
+  <rect width="800" height="480" fill="#ecfeff"/>
+  <rect x="315" y="90" width="170" height="290" rx="20" fill="#06b6d4"/>
+  <rect x="350" y="40" width="100" height="70" rx="10" fill="#67e8f9"/>
+  <rect x="390" y="10" width="20" height="50" fill="#155e75"/>
+  <circle cx="350" cy="180" r="12" fill="#cffafe"/>
+  <circle cx="450" cy="220" r="12" fill="#cffafe"/>
+  <text x="400" y="430" text-anchor="middle" fill="#0e7490" font-size="42" font-family="Arial" font-weight="700">Cool Drink</text>
+</svg>
