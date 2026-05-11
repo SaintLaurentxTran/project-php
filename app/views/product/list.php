@@ -26,7 +26,18 @@ $images = [
             <?php foreach ($products as $index => $product): ?>
                 <div class="col-sm-6 col-lg-4">
                     <article class="product-card h-100">
-                        <img src="<?php echo htmlspecialchars($images[$index % count($images)], ENT_QUOTES, 'UTF-8'); ?>" alt="" class="product-image">
+                        <?php $productImages = $product->getImages(); ?>
+                        <?php if (empty($productImages)): ?>
+                            <img src="<?php echo htmlspecialchars($images[$index % count($images)], ENT_QUOTES, 'UTF-8'); ?>" alt="" class="product-image">
+                        <?php elseif (count($productImages) === 1): ?>
+                            <img src="<?php echo htmlspecialchars($basePath . '/' . $productImages[0], ENT_QUOTES, 'UTF-8'); ?>" alt="" class="product-image">
+                        <?php else: ?>
+                            <div class="product-slider" data-product-slider>
+                                <?php foreach ($productImages as $imageIndex => $imagePath): ?>
+                                    <img src="<?php echo htmlspecialchars($basePath . '/' . $imagePath, ENT_QUOTES, 'UTF-8'); ?>" alt="" class="product-image slide-image<?php echo $imageIndex === 0 ? ' is-active' : ''; ?>">
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                         <h3 class="product-name"><?php echo htmlspecialchars($product->getName(), ENT_QUOTES, 'UTF-8'); ?></h3>
                         <p class="product-description"><?php echo htmlspecialchars($product->getDescription(), ENT_QUOTES, 'UTF-8'); ?></p>
                         <p class="product-price mb-3">Giá: <?php echo htmlspecialchars($product->getPrice(), ENT_QUOTES, 'UTF-8'); ?> đ</p>

@@ -21,7 +21,7 @@ $basePath = '/project1';
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="<?php echo $basePath; ?>/Product/add" class="row g-3" id="product-form">
+                <form method="POST" action="<?php echo $basePath; ?>/Product/add" class="row g-3" id="product-form" enctype="multipart/form-data">
                     <div class="col-12">
                         <label for="name" class="form-label">Tên sản phẩm</label>
                         <input type="text" id="name" name="name" class="form-control" required minlength="10" maxlength="100">
@@ -33,6 +33,11 @@ $basePath = '/project1';
                     <div class="col-12">
                         <label for="price" class="form-label">Giá</label>
                         <input type="number" id="price" name="price" step="0.01" min="0.01" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label for="images" class="form-label">Hình ảnh sản phẩm</label>
+                        <input type="file" id="images" name="images[]" class="form-control" accept="image/*" multiple>
+                        <div class="form-text">Có thể chọn nhiều ảnh (JPG, PNG, GIF, WEBP).</div>
                     </div>
                     <div class="col-12 d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Thêm sản phẩm</button>
