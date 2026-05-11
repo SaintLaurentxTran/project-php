@@ -22,7 +22,7 @@ private function ensureUploadDirectory()
 {
 $uploadDir = dirname(__DIR__, 2) . '/public/uploads';
 if (!is_dir($uploadDir)) {
-mkdir($uploadDir, 0775, true);
+mkdir($uploadDir, 0755, true);
 }
 return $uploadDir;
 }
@@ -63,14 +63,29 @@ return $uploadedImages;
 private function deleteImages($imagePaths)
 {
 $baseDir = dirname(__DIR__, 2) . '/';
+$uploadDir = $this->ensureUploadDirectory();
+$uploadDirReal = realpath($uploadDir);
+if ($uploadDirReal === false) {
+return;
+}
 foreach ($imagePaths as $imagePath) {
+if (!is_string($imagePath)) {
+continue;
+}
 $safePath = ltrim($imagePath, '/');
 if (strpos($safePath, 'public/uploads/') !== 0) {
 continue;
 }
 $fullPath = $baseDir . $safePath;
-if (is_file($fullPath)) {
-unlink($fullPath);
+$realPath = realpath($fullPath);
+if ($realPath === false) {
+continue;
+}
+if (strpos($realPath, $uploadDirReal) !== 0) {
+continue;
+}
+if (is_file($realPath)) {
+unlink($realPath);
 }
 }
 }
@@ -101,10 +116,15 @@ $errors[] = 'Tên sản phẩm phải có từ 10 đến 100 ký tự.';
 if (!is_numeric($price) || $price <= 0) {
 $errors[] = 'Giá phải là một số dương lớn hơn 0.';
 }
+if (empty($errors)) {
 $uploadedImages = $this->handleUploadedImages('images', $errors);
+if (!empty($errors) && !empty($uploadedImages)) {
+$this->deleteImages($uploadedImages);
+}
+}
 if (empty($errors)) {
 $id = count($this->products) + 1;
-$product = new ProductModel($id, $name, $description, $price, $uploadedImages);
+$product = new ProductModel($id, $name, $description, $price, $uploadedImages ?? []);
 $this->products[] = $product;
 
 $_SESSION['products'] = $this->products;
@@ -120,24 +140,49 @@ public function edit($id)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 foreach ($this->products as $key => $product) {
 if ($product->getID() == $id) {
+$name = $_POST['name'] ?? '';
+$description = $_POST['description'] ?? '';
+$price = $_POST['price'] ?? '';
+if (empty($name)) {
+$errors[] = 'Tên sản phẩm là bắt buộc.';
+} elseif (strlen($name) < 10 || strlen($name) > 100) {
+$errors[] = 'Tên sản phẩm phải có từ 10 đến 100 ký tự.';
+}
+if (!is_numeric($price) || $price <= 0) {
+$errors[] = 'Giá phải là một số dương lớn hơn 0.';
+}
+if (empty($errors)) {
     $removeImages = $_POST['remove_images'] ?? [];
     if (!is_array($removeImages)) {
     $removeImages = [];
     }
     $currentImages = $this->products[$key]->getImages();
-    $removeImages = array_values(array_intersect($removeImages, $currentImages));
+    $removeImages = array_values(array_filter($removeImages, function ($imagePath) use ($currentImages) {
+    if (!is_string($imagePath)) {
+    return false;
+    }
+    $safePath = ltrim($imagePath, '/');
+    if (strpos($safePath, 'public/uploads/') !== 0) {
+    return false;
+    }
+    return in_array($imagePath, $currentImages, true);
+    }));
     $remainingImages = array_values(array_diff($currentImages, $removeImages));
     $uploadedImages = $this->handleUploadedImages('images', $errors);
+    if (!empty($errors) && !empty($uploadedImages)) {
+    $this->deleteImages($uploadedImages);
+    }
     if (empty($errors)) {
-    $this->products[$key]->setName($_POST['name']);
-    $this->products[$key]->setDescription($_POST['description']);
-    $this->products[$key]->setPrice($_POST['price']);
+    $this->products[$key]->setName($name);
+    $this->products[$key]->setDescription($description);
+    $this->products[$key]->setPrice($price);
     $this->products[$key]->setImages(array_merge($remainingImages, $uploadedImages));
     $this->deleteImages($removeImages);
     $_SESSION['products'] = $this->products;
     header('Location: /project1/Product/list');
     exit();
     }
+}
 break;
 }
 }
