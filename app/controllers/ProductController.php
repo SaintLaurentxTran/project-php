@@ -76,6 +76,20 @@ return false;
 $safePath = ltrim($imagePath, '/');
 return strpos($safePath, 'public/uploads/') === 0;
 }
+private function cleanupFailedUploads($errors, $uploadedImages)
+{
+if (!empty($errors) && !empty($uploadedImages)) {
+$this->deleteImages($uploadedImages);
+}
+}
+private function filterRemovableImages($removeImages, $currentImages)
+{
+$currentImageLookup = array_flip($currentImages);
+$filteredImages = array_filter($removeImages, function ($imagePath) use ($currentImageLookup) {
+return $this->isSafeUploadPath($imagePath) && isset($currentImageLookup[$imagePath]);
+});
+return array_values($filteredImages);
+}
 private function deleteImages($imagePaths)
 {
 $baseDir = dirname(__DIR__, 2) . '/';
@@ -134,9 +148,7 @@ $errors[] = 'Giá phải là một số dương lớn hơn 0.';
 }
 if (empty($errors)) {
 $uploadedImages = $this->handleUploadedImages('images', $errors);
-if (!empty($errors) && !empty($uploadedImages)) {
-$this->deleteImages($uploadedImages);
-}
+$this->cleanupFailedUploads($errors, $uploadedImages);
 }
 if (empty($errors)) {
 $id = count($this->products) + 1;
@@ -173,15 +185,10 @@ if (empty($errors)) {
     $removeImages = [];
     }
     $currentImages = $this->products[$key]->getImages();
-    $currentImageLookup = array_flip($currentImages);
-    $removeImages = array_values(array_filter($removeImages, function ($imagePath) use ($currentImageLookup) {
-    return $this->isSafeUploadPath($imagePath) && isset($currentImageLookup[$imagePath]);
-    }));
+    $removeImages = $this->filterRemovableImages($removeImages, $currentImages);
     $remainingImages = array_values(array_diff($currentImages, $removeImages));
     $uploadedImages = $this->handleUploadedImages('images', $errors);
-    if (!empty($errors) && !empty($uploadedImages)) {
-    $this->deleteImages($uploadedImages);
-    }
+    $this->cleanupFailedUploads($errors, $uploadedImages);
     if (empty($errors)) {
     $this->products[$key]->setName($name);
     $this->products[$key]->setDescription($description);

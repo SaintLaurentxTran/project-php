@@ -48,8 +48,8 @@ public function getPrice()
 {
 return $this->Price;
 }
-    public function setPrice($Price)
-    {
+public function setPrice($Price)
+{
 $this->Price = $Price;
 }
 // Getter và Setter cho thuộc tính Images
