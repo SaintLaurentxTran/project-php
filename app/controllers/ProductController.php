@@ -60,6 +60,14 @@ $uploadedImages[] = 'public/uploads/' . $fileName;
 }
 return $uploadedImages;
 }
+private function isSafeUploadPath($imagePath)
+{
+if (!is_string($imagePath)) {
+return false;
+}
+$safePath = ltrim($imagePath, '/');
+return strpos($safePath, 'public/uploads/') === 0;
+}
 private function deleteImages($imagePaths)
 {
 $baseDir = dirname(__DIR__, 2) . '/';
@@ -69,13 +77,10 @@ if ($uploadDirReal === false) {
 return;
 }
 foreach ($imagePaths as $imagePath) {
-if (!is_string($imagePath)) {
+if (!$this->isSafeUploadPath($imagePath)) {
 continue;
 }
 $safePath = ltrim($imagePath, '/');
-if (strpos($safePath, 'public/uploads/') !== 0) {
-continue;
-}
 $fullPath = $baseDir . $safePath;
 $realPath = realpath($fullPath);
 if ($realPath === false) {
@@ -158,14 +163,7 @@ if (empty($errors)) {
     }
     $currentImages = $this->products[$key]->getImages();
     $removeImages = array_values(array_filter($removeImages, function ($imagePath) use ($currentImages) {
-    if (!is_string($imagePath)) {
-    return false;
-    }
-    $safePath = ltrim($imagePath, '/');
-    if (strpos($safePath, 'public/uploads/') !== 0) {
-    return false;
-    }
-    return in_array($imagePath, $currentImages, true);
+    return $this->isSafeUploadPath($imagePath) && in_array($imagePath, $currentImages, true);
     }));
     $remainingImages = array_values(array_diff($currentImages, $removeImages));
     $uploadedImages = $this->handleUploadedImages('images', $errors);

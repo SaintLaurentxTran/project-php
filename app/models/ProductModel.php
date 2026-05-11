@@ -5,17 +5,17 @@ class ProductModel
 private $ID;
 private $Name;
 private $Description;
-    private $Price;
-    private $Images;
+private $Price;
+private $Images;
 // Constructor để khởi tạo đối tượng ProductModel
-    public function __construct($ID, $Name, $Description, $Price, $Images = [])
-    {
-    $this->ID = $ID;
-    $this->Name = $Name;
-    $this->Description = $Description;
-    $this->Price = $Price;
-    $this->Images = $Images;
-    }
+public function __construct($ID, $Name, $Description, $Price, $Images = [])
+{
+$this->ID = $ID;
+$this->Name = $Name;
+$this->Description = $Description;
+$this->Price = $Price;
+$this->Images = $Images;
+}
 // Getter và Setter cho thuộc tính ID
 public function getID()
 {
@@ -50,16 +50,16 @@ return $this->Price;
 }
     public function setPrice($Price)
     {
-    $this->Price = $Price;
-    }
-    // Getter và Setter cho thuộc tính Images
-    public function getImages()
-    {
-    return is_array($this->Images) ? $this->Images : [];
-    }
-    public function setImages($Images)
-    {
-    $this->Images = is_array($Images) ? $Images : [];
-    }
+$this->Price = $Price;
+}
+// Getter và Setter cho thuộc tính Images
+public function getImages()
+{
+return is_array($this->Images) ? $this->Images : [];
+}
+public function setImages($Images)
+{
+$this->Images = is_array($Images) ? $Images : [];
+}
 }
 ?>
