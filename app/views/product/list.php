@@ -26,7 +26,7 @@ $images = [
             <?php foreach ($products as $index => $product): ?>
                 <div class="col-sm-6 col-lg-4">
                     <article class="product-card h-100">
-                        <img src="<?php echo htmlspecialchars($images[$index % count($images)], ENT_QUOTES, 'UTF-8'); ?>" alt="Snack" class="product-image">
+                        <img src="<?php echo htmlspecialchars($images[$index % count($images)], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars('Ảnh sản phẩm ' . $product->getName(), ENT_QUOTES, 'UTF-8'); ?>" class="product-image">
                         <h3 class="product-name"><?php echo htmlspecialchars($product->getName(), ENT_QUOTES, 'UTF-8'); ?></h3>
                         <p class="product-description"><?php echo htmlspecialchars($product->getDescription(), ENT_QUOTES, 'UTF-8'); ?></p>
                         <p class="product-price mb-3">Giá: <?php echo htmlspecialchars($product->getPrice(), ENT_QUOTES, 'UTF-8'); ?> đ</p>

@@ -1,6 +1,11 @@
 (function () {
     'use strict';
 
+    var validationMessages = {
+        invalidNameLength: 'Tên sản phẩm phải có từ 10 đến 100 ký tự.',
+        invalidPrice: 'Giá phải là một số dương lớn hơn 0.'
+    };
+
     var form = document.getElementById('product-form');
     if (!form) {
         return;
@@ -19,11 +24,11 @@
         var errors = [];
 
         if (nameLength < 10 || nameLength > 100) {
-            errors.push('Tên sản phẩm phải có từ 10 đến 100 ký tự.');
+            errors.push(validationMessages.invalidNameLength);
         }
 
         if (Number.isNaN(priceValue) || priceValue <= 0) {
-            errors.push('Giá phải là một số dương lớn hơn 0.');
+            errors.push(validationMessages.invalidPrice);
         }
 
         if (errors.length > 0) {
