@@ -53,11 +53,4 @@
         });
     }
 
-    if (sliderIntervals.length > 0) {
-        window.addEventListener('beforeunload', function () {
-            sliderIntervals.forEach(function (intervalId) {
-                window.clearInterval(intervalId);
-            });
-        });
-    }
 })();

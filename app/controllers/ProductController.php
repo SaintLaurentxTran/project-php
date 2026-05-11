@@ -18,11 +18,16 @@ if (isset($_SESSION['products'])) {
 $this->products = $_SESSION['products'];
 }
 }
-private function ensureUploadDirectory()
+private function ensureUploadDirectory(&$errors = null)
 {
 $uploadDir = dirname(__DIR__, 2) . '/public/uploads';
 if (!is_dir($uploadDir)) {
-mkdir($uploadDir, 0755, true);
+if (!mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+if (is_array($errors)) {
+$errors[] = 'Không thể tạo thư mục lưu ảnh. Vui lòng kiểm tra quyền truy cập.';
+}
+return null;
+}
 }
 return $uploadDir;
 }
@@ -32,7 +37,10 @@ $uploadedImages = [];
 if (empty($_FILES[$fieldName]) || empty($_FILES[$fieldName]['name'][0])) {
 return $uploadedImages;
 }
-$uploadDir = $this->ensureUploadDirectory();
+$uploadDir = $this->ensureUploadDirectory($errors);
+if ($uploadDir === null) {
+return $uploadedImages;
+}
 $fileData = $_FILES[$fieldName];
 foreach ($fileData['name'] as $index => $originalName) {
 $errorCode = $fileData['error'][$index];
@@ -72,6 +80,9 @@ private function deleteImages($imagePaths)
 {
 $baseDir = dirname(__DIR__, 2) . '/';
 $uploadDir = $this->ensureUploadDirectory();
+if ($uploadDir === null) {
+return;
+}
 $uploadDirReal = realpath($uploadDir);
 if ($uploadDirReal === false) {
 return;
