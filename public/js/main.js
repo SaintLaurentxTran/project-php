@@ -3,7 +3,7 @@
 
     var validationMessages = {
         invalidNameLength: 'Tên sản phẩm phải có từ 10 đến 100 ký tự.',
-        invalidPrice: 'Giá phải là một số dương lớn hơn 0.'
+        invalidPrice: 'Giá phải lớn hơn hoặc bằng 0.01.'
     };
 
     var form = document.getElementById('product-form');
@@ -27,7 +27,7 @@
             errors.push(validationMessages.invalidNameLength);
         }
 
-        if (Number.isNaN(priceValue) || priceValue <= 0) {
+        if (Number.isNaN(priceValue) || priceValue < 0.01) {
             errors.push(validationMessages.invalidPrice);
         }
 
