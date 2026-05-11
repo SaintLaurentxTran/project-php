@@ -1,45 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Thêm sản phẩm</title>
-<script>
-function validateForm() {
-let name = document.getElementById('name').value;
-let price = document.getElementById('price').value;
-let errors = [];
-if (name.length < 10 || name.length > 100) {
-errors.push('Tên sản phẩm phải có từ 10 đến 100 ký tự.');
-}
-if (price <= 0 || isNaN(price)) {
-errors.push('Giá phải là một số dương lớn hơn 0.');
-}
-if (errors.length > 0) {
-alert(errors.join('\n'));
-return false;
-}
-return true;
-}
-</script>
-</head>
-<body>
-<h1>Thêm sản phẩm mới</h1>
-<?php if (!empty($errors)): ?>
-<ul>
-<?php foreach ($errors as $error): ?>
-<li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
-<?php endforeach; ?>
-</ul>
-<?php endif; ?>
-<form method="POST" action="/project1/Product/add" onsubmit="return
-validateForm();">
-<label for="name">Tên sản phẩm:</label>
-<input type="text" id="name" name="name" required><br><br>
-<label for="description">Mô tả:</label>
-<textarea id="description" name="description" required></textarea><br><br>
-<label for="price">Giá:</label>
-<input type="number" id="price" name="price" step="0.01" required><br><br>
-<button type="submit">Thêm sản phẩm</button>
-</form>
-<a href="/project1/Product/list">Quay lại danh sách sản phẩm</a>
-</body>
-</html>
+<?php
+$pageTitle = 'Thêm sản phẩm - SnackHub';
+$activePage = 'list';
+$showHero = false;
+include 'app/views/layout/header.php';
+$basePath = '/project1';
+?>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <h2 class="section-title mb-4">Thêm sản phẩm mới</h2>
+
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-danger" role="alert">
+                        <ul class="mb-0 ps-3">
+                            <?php foreach ($errors as $error): ?>
+                                <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST" action="<?php echo $basePath; ?>/Product/add" class="row g-3" id="product-form">
+                    <div class="col-12">
+                        <label for="name" class="form-label">Tên sản phẩm</label>
+                        <input type="text" id="name" name="name" class="form-control" required minlength="10" maxlength="100">
+                    </div>
+                    <div class="col-12">
+                        <label for="description" class="form-label">Mô tả</label>
+                        <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="price" class="form-label">Giá</label>
+                        <input type="number" id="price" name="price" step="0.01" min="0.01" class="form-control" required>
+                    </div>
+                    <div class="col-12 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Thêm sản phẩm</button>
+                        <a href="<?php echo $basePath; ?>/Product/list" class="btn btn-outline-secondary">Quay lại</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<?php include 'app/views/layout/footer.php'; ?>

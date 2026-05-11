@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" role="img" aria-label="Snack hero">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#fff7ed" offset="0"/>
+      <stop stop-color="#fed7aa" offset="1"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" rx="28" fill="url(#g)"/>
+  <circle cx="165" cy="220" r="72" fill="#fb923c"/>
+  <circle cx="315" cy="170" r="60" fill="#f97316"/>
+  <circle cx="430" cy="245" r="65" fill="#fdba74"/>
+  <text x="300" y="355" text-anchor="middle" fill="#9a3412" font-size="38" font-family="Arial, sans-serif" font-weight="700">SnackHub</text>
+</svg>
