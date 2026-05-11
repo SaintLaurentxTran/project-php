@@ -19,7 +19,11 @@ $basePath = '/project1';
                         </ul>
                     </div>
                 <?php endif; ?>
-                <form method="POST" action="<?php echo $basePath; ?>/Product/edit/<?php echo (int) $product->getID(); ?>" class="row g-3" id="product-form" enctype="multipart/form-data">
+                <form method="POST"
+                      action="<?php echo $basePath; ?>/Product/edit/<?php echo (int) $product->getID(); ?>"
+                      class="row g-3"
+                      id="product-form"
+                      enctype="multipart/form-data">
                     <div class="col-12">
                         <label for="name" class="form-label">Tên sản phẩm</label>
                         <input type="text" id="name" name="name" class="form-control" value="<?php echo htmlspecialchars($product->getName(), ENT_QUOTES, 'UTF-8'); ?>" required minlength="10" maxlength="100">

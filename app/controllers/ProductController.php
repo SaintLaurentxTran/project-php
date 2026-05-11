@@ -173,8 +173,9 @@ if (empty($errors)) {
     $removeImages = [];
     }
     $currentImages = $this->products[$key]->getImages();
-    $removeImages = array_values(array_filter($removeImages, function ($imagePath) use ($currentImages) {
-    return $this->isSafeUploadPath($imagePath) && in_array($imagePath, $currentImages, true);
+    $currentImageLookup = array_flip($currentImages);
+    $removeImages = array_values(array_filter($removeImages, function ($imagePath) use ($currentImageLookup) {
+    return $this->isSafeUploadPath($imagePath) && isset($currentImageLookup[$imagePath]);
     }));
     $remainingImages = array_values(array_diff($currentImages, $removeImages));
     $uploadedImages = $this->handleUploadedImages('images', $errors);

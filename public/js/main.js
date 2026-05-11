@@ -36,7 +36,6 @@
     }
 
     var sliders = document.querySelectorAll('[data-product-slider]');
-    var sliderIntervals = [];
     if (sliders.length > 0) {
         sliders.forEach(function (slider) {
             var slides = slider.querySelectorAll('.slide-image');
@@ -44,12 +43,11 @@
                 return;
             }
             var activeIndex = 0;
-            var intervalId = window.setInterval(function () {
+            window.setInterval(function () {
                 slides[activeIndex].classList.remove('is-active');
                 activeIndex = (activeIndex + 1) % slides.length;
                 slides[activeIndex].classList.add('is-active');
             }, 3000);
-            sliderIntervals.push(intervalId);
         });
     }
 
