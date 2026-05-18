@@ -9,8 +9,7 @@
 </ul>
 </div>
 <?php endif; ?>
-<form method="POST" action="/webbanhang/Product/update" onsubmit="return
-validateForm();">
+<form method="POST" action="/webbanhang/Product/update">
 <input type="hidden" name="id" value="<?php echo $product->id; ?>">
 <div class="form-group">
 <label for="name">Tên sản phẩm:</label>

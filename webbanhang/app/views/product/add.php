@@ -9,8 +9,7 @@
 </ul>
 </div>
 <?php endif; ?>
-<form method="POST" action="/webbanhang/Product/save" onsubmit="return
-validateForm();">
+<form method="POST" action="/webbanhang/Product/save">
 <div class="form-group">
 <label for="name">Tên sản phẩm:</label>
 <input type="text" id="name" name="name" class="form-control" required>

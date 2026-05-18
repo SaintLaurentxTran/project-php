@@ -11,7 +11,7 @@
       <strong>Giá:</strong> <?php echo htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8'); ?> VNĐ
     </p>
     <p class="card-text">
-      <strong>Danh mục:</strong> <?php echo htmlspecialchars($product->category_id, ENT_QUOTES, 'UTF-8'); ?>
+      <strong>Danh mục:</strong> <?php echo htmlspecialchars($product->category_name, ENT_QUOTES, 'UTF-8'); ?>
     </p>
     <div class="mt-3">
       <a href="/webbanhang/Product/edit/<?php echo $product->id; ?>" class="btn btn-warning">Sửa</a>
