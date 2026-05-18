@@ -33,6 +33,6 @@ INSERT INTO category (name, description) VALUES
 -- Insert sample products
 INSERT INTO product (name, description, price, category_id) VALUES
 ('Laptop Dell XPS 13', 'Laptop cao cấp với bộ xử lý Intel Core i7', 899.99, 1),
-('Áo thun trắng', 'áo thun 100% cotton màu trắng', 15.99, 2),
+('Áo thun trắng', 'Áo thun 100% cotton màu trắng', 15.99, 2),
 ('PHP Programming', 'Hướng dẫn lập trình PHP cho người mới bắt đầu', 29.99, 3),
 ('Cà phê hạt Arabica', 'Cà phê nguyên chất nhập khẩu từ Brazil', 12.99, 4);
