@@ -1,39 +1,78 @@
-<?php include 'app/views/shared/header.php'; ?>
-<h1>Thêm sản phẩm mới</h1>
-<?php if (!empty($errors)): ?>
-<div class="alert alert-danger">
-<ul>
-<?php foreach ($errors as $error): ?>
-<li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
-<?php endforeach; ?>
-</ul>
+<?php include VIEWS_PATH . DIRECTORY_SEPARATOR . 'shared' . DIRECTORY_SEPARATOR . 'header.php'; ?>
+
+<div class="page-header">
+    <h1><i class="fas fa-plus-circle"></i> Thêm Sản Phẩm Mới</h1>
 </div>
-<?php endif; ?>
-<form method="POST" action="/webbanhang/Product/save">
-<div class="form-group">
-<label for="name">Tên sản phẩm:</label>
-<input type="text" id="name" name="name" class="form-control" required>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="/webbanhang/Product/save" class="form">
+                    <div class="form-group">
+                        <label for="name" class="font-weight-bold">
+                            <i class="fas fa-cube"></i> Tên Sản Phẩm
+                        </label>
+                        <input type="text" class="form-control <?php echo isset($errors['name']) ? 'is-invalid' : ''; ?>" id="name" name="name" placeholder="Nhập tên sản phẩm" value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8') : ''; ?>" required>
+                        <?php if (isset($errors['name'])): ?>
+                            <div class="invalid-feedback d-block">
+                                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($errors['name'], ENT_QUOTES, 'UTF-8'); ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description" class="font-weight-bold">
+                            <i class="fas fa-align-left"></i> Mô Tả
+                        </label>
+                        <textarea class="form-control <?php echo isset($errors['description']) ? 'is-invalid' : ''; ?>" id="description" name="description" rows="4" placeholder="Nhập mô tả sản phẩm" required><?php echo isset($_POST['description']) ? htmlspecialchars($_POST['description'], ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
+                        <?php if (isset($errors['description'])): ?>
+                            <div class="invalid-feedback d-block">
+                                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($errors['description'], ENT_QUOTES, 'UTF-8'); ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price" class="font-weight-bold">
+                            <i class="fas fa-money-bill-wave"></i> Giá (VND)
+                        </label>
+                        <input type="number" class="form-control <?php echo isset($errors['price']) ? 'is-invalid' : ''; ?>" id="price" name="price" placeholder="Nhập giá sản phẩm" step="1" min="0" value="<?php echo isset($_POST['price']) ? htmlspecialchars($_POST['price'], ENT_QUOTES, 'UTF-8') : ''; ?>" required>
+                        <?php if (isset($errors['price'])): ?>
+                            <div class="invalid-feedback d-block">
+                                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($errors['price'], ENT_QUOTES, 'UTF-8'); ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category_id" class="font-weight-bold">
+                            <i class="fas fa-tag"></i> Danh Mục
+                        </label>
+                        <select class="form-control" id="category_id" name="category_id">
+                            <option value="">-- Chọn Danh Mục --</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?php echo htmlspecialchars($category->id, ENT_QUOTES, 'UTF-8'); ?>" <?php echo (isset($_POST['category_id']) && $_POST['category_id'] == $category->id) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($category->name, ENT_QUOTES, 'UTF-8'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group row justify-content-end">
+                        <button type="submit" class="btn btn-success btn-lg mr-2">
+                            <i class="fas fa-save"></i> Lưu Sản Phẩm
+                        </button>
+                        <a href="/webbanhang/Product/" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="form-group">
-<label for="description">Mô tả:</label>
-<textarea id="description" name="description" class="form-control"
-required></textarea>
-</div>
-<div class="form-group">
-<label for="price">Giá:</label>
-<input type="number" id="price" name="price" class="form-control" step="0.01"
-required>
-</div>
-<div class="form-group">
-<label for="category_id">Danh mục:</label>
-<select id="category_id" name="category_id" class="form-control" required>
-<?php foreach ($categories as $category): ?>
-<option value="<?php echo $category->id; ?>"><?php echo
-htmlspecialchars($category->name, ENT_QUOTES, 'UTF-8'); ?></option>
-<?php endforeach; ?>
-</select>
-</div>
-<button type="submit" class="btn btn-primary">Thêm sản phẩm</button>
-</form>
-<a href="/webbanhang/Product/" class="btn btn-secondary mt-2">Quay lại danh sách sản phẩm</a>
-<?php include 'app/views/shared/footer.php'; ?>
+
+<?php include VIEWS_PATH . DIRECTORY_SEPARATOR . 'shared' . DIRECTORY_SEPARATOR . 'footer.php'; ?>
