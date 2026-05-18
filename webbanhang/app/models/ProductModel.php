@@ -1,92 +1,73 @@
 <?php
-class ProductModel
-{
-private $conn;
-private $table_name = "product";
-public function __construct($db)
-{
-$this->conn = $db;
+class ProductModel {
+  private PDO $pdo;
+
+  public function __construct() {
+    $cfg = require __DIR__ . '/../config/database.php';
+    $dsn = "mysql:host={$cfg['host']};dbname={$cfg['dbname']};charset={$cfg['charset']}";
+    $this->pdo = new PDO($dsn, $cfg['user'], $cfg['pass'], [
+      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+  }
+
+  public function all(int $limit = 10): array {
+    $sql = "SELECT p.*, c.name AS category_name
+            FROM products p
+            JOIN categories c ON c.id = p.category_id
+            ORDER BY p.id DESC
+            LIMIT :limit";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll();
+  }
+
+  public function find(int $id): ?array {
+    $stmt = $this->pdo->prepare(
+      "SELECT p.*, c.name AS category_name
+       FROM products p
+       JOIN categories c ON c.id = p.category_id
+       WHERE p.id = ?"
+    );
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+  }
+
+  public function create(array $data): int {
+    $stmt = $this->pdo->prepare(
+      "INSERT INTO products(category_id, name, price, description, image)
+       VALUES (?, ?, ?, ?, ?)"
+    );
+    $stmt->execute([
+      (int)$data['category_id'],
+      trim($data['name']),
+      (float)$data['price'],
+      $data['description'] ?? null,
+      $data['image'] ?? null
+    ]);
+    return (int)$this->pdo->lastInsertId();
+  }
+
+  public function update(int $id, array $data): bool {
+    $stmt = $this->pdo->prepare(
+      "UPDATE products
+       SET category_id = ?, name = ?, price = ?, description = ?, image = ?
+       WHERE id = ?"
+    );
+    return $stmt->execute([
+      (int)$data['category_id'],
+      trim($data['name']),
+      (float)$data['price'],
+      $data['description'] ?? null,
+      $data['image'] ?? null,
+      $id
+    ]);
+  }
+
+  public function delete(int $id): bool {
+    $stmt = $this->pdo->prepare("DELETE FROM products WHERE id = ?");
+    return $stmt->execute([$id]);
+  }
 }
-public function getProducts()
-{
-$query = "SELECT p.id, p.name, p.description, p.price, c.name as category_name
-FROM " . $this->table_name . " p
-LEFT JOIN category c ON p.category_id = c.id";
-$stmt = $this->conn->prepare($query);
-$stmt->execute();
-$result = $stmt->fetchAll(PDO::FETCH_OBJ);
-return $result;
-}
-public function getProductById($id)
-{
-$query = "SELECT p.id, p.name, p.description, p.price, p.category_id, c.name as category_name
-FROM " . $this->table_name . " p
-LEFT JOIN category c ON p.category_id = c.id WHERE p.id = :id";
-$stmt = $this->conn->prepare($query);
-$stmt->bindParam(':id', $id);
-$stmt->execute();
-$result = $stmt->fetch(PDO::FETCH_OBJ);
-return $result;
-}
-public function addProduct($name, $description, $price, $category_id)
-{
-$errors = [];
-if (empty($name)) {
-$errors['name'] = 'Tên sản phẩm không được để trống';
-}
-if (empty($description)) {
-$errors['description'] = 'Mô tả không được để trống';
-}
-if (!is_numeric($price) || $price < 0) {
-$errors['price'] = 'Giá sản phẩm không hợp lệ';
-}
-if (count($errors) > 0) {
-return $errors;
-}
-$query = "INSERT INTO " . $this->table_name . " (name, description, price,
-category_id) VALUES (:name, :description, :price, :category_id)";
-$stmt = $this->conn->prepare($query);
-$name = htmlspecialchars(strip_tags($name));
-$description = htmlspecialchars(strip_tags($description));
-$price = htmlspecialchars(strip_tags($price));
-$category_id = htmlspecialchars(strip_tags($category_id));
-$stmt->bindParam(':name', $name);
-$stmt->bindParam(':description', $description);
-$stmt->bindParam(':price', $price);
-$stmt->bindParam(':category_id', $category_id);
-if ($stmt->execute()) {
-return true;
-}
-return false;
-}
-public function updateProduct($id, $name, $description, $price, $category_id)
-{
-$query = "UPDATE " . $this->table_name . " SET name=:name,
-description=:description, price=:price, category_id=:category_id WHERE id=:id";
-$stmt = $this->conn->prepare($query);
-$name = htmlspecialchars(strip_tags($name));
-$description = htmlspecialchars(strip_tags($description));
-$price = htmlspecialchars(strip_tags($price));
-$category_id = htmlspecialchars(strip_tags($category_id));
-$stmt->bindParam(':id', $id);
-$stmt->bindParam(':name', $name);
-$stmt->bindParam(':description', $description);
-$stmt->bindParam(':price', $price);
-$stmt->bindParam(':category_id', $category_id);
-if ($stmt->execute()) {
-return true;
-}
-return false;
-}
-public function deleteProduct($id)
-{
-$query = "DELETE FROM " . $this->table_name . " WHERE id=:id";
-$stmt = $this->conn->prepare($query);
-$stmt->bindParam(':id', $id);
-if ($stmt->execute()) {
-return true;
-}
-return false;
-}
-}
-?>
