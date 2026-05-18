@@ -22,9 +22,9 @@ phẩm</a></li>
 <!-- Cột mạng xã hội -->
 <div class="col-lg-3 col-md-6 mb-4">
     <h5 class="text-uppercase">Kết nối với chúng tôi</h5>
-<a href="#" class="text-dark mr-3"><i class="fab fa-facebookf"></i></a>
+<a href="#" class="text-dark mr-3"><i class="fab fa-facebook-f"></i></a>
 <a href="#" class="text-dark mr-3"><i class="fab fa-twitter"></i></a>
-<a href="#" class="text-dark mr-3"><i class="fab fainstagram"></i></a>
+<a href="#" class="text-dark mr-3"><i class="fab fa-instagram"></i></a>
 </div>
 </div>
 </div>
@@ -34,5 +34,10 @@ phẩm</a></li>
 </div>
 </footer>
 <!-- Font Awesome Icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js"
-crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</div><!-- end container -->
+</body>
+</html>
