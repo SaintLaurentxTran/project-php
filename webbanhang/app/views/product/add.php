@@ -9,8 +9,7 @@
 </ul>
 </div>
 <?php endif; ?>
-<form method="POST" action="/webbanhang/Product/save" onsubmit="return
-validateForm();">
+<form method="POST" action="/webbanhang/Product/save">
 <div class="form-group">
 <label for="name">Tên sản phẩm:</label>
 <input type="text" id="name" name="name" class="form-control" required>
@@ -36,6 +35,5 @@ htmlspecialchars($category->name, ENT_QUOTES, 'UTF-8'); ?></option>
 </div>
 <button type="submit" class="btn btn-primary">Thêm sản phẩm</button>
 </form>
-<a href="/webbanhang/Product/list" class="btn btn-secondary mt-2">Quay lại danh sách
-sản phẩm</a>
+<a href="/webbanhang/Product/" class="btn btn-secondary mt-2">Quay lại danh sách sản phẩm</a>
 <?php include 'app/views/shared/footer.php'; ?>

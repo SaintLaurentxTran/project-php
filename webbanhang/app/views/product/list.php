@@ -8,16 +8,11 @@
 <?php echo htmlspecialchars($product->name, ENT_QUOTES, 'UTF-8'); ?>
 </a>
 </h2>
-<p><?php echo htmlspecialchars($product->description, ENT_QUOTES, 'UTF-
-8'); ?></p>
-<p>Giá: <?php echo htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8');
-?></p>
+<p><?php echo htmlspecialchars($product->description, ENT_QUOTES, 'UTF-8'); ?></p>
+<p>Giá: <?php echo htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8'); ?></p>
 <p><strong>Danh mục:</strong> <?php echo htmlspecialchars($product->category_name, ENT_QUOTES, 'UTF-8'); ?></p>
-<a href="/webbanhang/Product/edit/<?php echo $product->id; ?>" class="btn
-btn-warning">Sửa</a>
-<a href="/webbanhang/Product/delete/<?php echo $product->id; ?>"
-class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm
-này?');">Xóa</a>
+<a href="/webbanhang/Product/edit/<?php echo $product->id; ?>" class="btn btn-warning">Sửa</a>
+<a href="/webbanhang/Product/delete/<?php echo $product->id; ?>" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">Xóa</a>
 </li>
 <?php endforeach; ?>
 </ul>
