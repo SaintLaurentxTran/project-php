@@ -70,7 +70,7 @@
         <div class="card mt-4 bg-light">
             <div class="card-body">
                 <h5 class="card-title">
-                    <i class="fas fa-quick-links"></i> Tùy Chọn Nhanh
+                    <i class="fas fa-bolt"></i> Tùy Chọn Nhanh
                 </h5>
                 <hr>
                 <a href="/webbanhang/Product/add" class="btn btn-success btn-block mb-2">
