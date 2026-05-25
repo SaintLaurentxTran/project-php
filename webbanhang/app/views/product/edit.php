@@ -1,64 +1,87 @@
-<div class="card">
-  <div class="head">
-    <h3>Sửa sản phẩm #<?= (int)$product['id'] ?></h3>
-    <a class="btn" href="index.php?controller=product&action=index">← Quay lại</a>
+<?php require __DIR__ . '/../shares/header.php'; ?>
+
+<section class="container pt-32">
+  <div class="seller-head">
+    <h1>Chỉnh Sửa Sản Phẩm</h1>
+    <a class="btn" href="index.php?c=seller&a=products">Quay lại</a>
   </div>
 
-  <div class="body">
-    <form method="post" enctype="multipart/form-data" action="index.php?controller=product&action=update">
-      <input type="hidden" name="id" value="<?= (int)$product['id'] ?>" />
+  <form class="grid2" method="POST" action="index.php?c=seller&a=update&id=<?= (int)$product['id'] ?>" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="<?= (int)$product['id'] ?>">
+    <input type="hidden" name="old_thumb_url" value="<?= htmlspecialchars($product['thumb_url']) ?>">
 
-      <div class="grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="card">
+      <h3>Thông tin cơ bản</h3>
+
+      <label class="label">Tên sản phẩm *</label>
+      <input class="input" name="name" required value="<?= htmlspecialchars($product['name']) ?>"/>
+
+      <div class="grid2 mt-8">
         <div>
-          <label>Danh mục</label>
-          <select name="category_id" required class="input">
-            <?php foreach ($categories as $c): ?>
-              <option value="<?= (int)$c['id'] ?>"
-                <?= ((int)$c['id'] === (int)$product['category_id']) ? 'selected' : '' ?>>
-                <?= htmlspecialchars($c['name']) ?>
+          <label class="label">Danh mục *</label>
+          <select class="input" name="category_id" required>
+            <?php foreach ($categories as $cat): ?>
+              <option value="<?= (int)$cat['id'] ?>" <?= ((int)$cat['id']===(int)$product['category_id'])?'selected':'' ?>>
+                <?= htmlspecialchars($cat['name']) ?>
               </option>
             <?php endforeach; ?>
           </select>
         </div>
-
         <div>
-          <label>Giá</label>
-          <input class="input" name="price" type="number" step="0.01"
-                 value="<?= htmlspecialchars($product['price']) ?>" />
+          <label class="label">Thành phố</label>
+          <input class="input" name="city" value="<?= htmlspecialchars($product['city']) ?>"/>
         </div>
       </div>
 
-      <div style="margin-top:14px">
-        <label>Tên sản phẩm</label>
-        <input class="input" name="name" required value="<?= htmlspecialchars($product['name']) ?>" />
+      <label class="label mt-8">Mô tả *</label>
+      <textarea class="input" name="description" rows="6" required><?= htmlspecialchars($product['description']) ?></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Giá & Tồn kho</h3>
+      <div class="grid2">
+        <div>
+          <label class="label">Giá (₫) *</label>
+          <input class="input" name="price" type="number" required value="<?= (int)$product['price'] ?>"/>
+        </div>
+        <div>
+          <label class="label">Giá cũ (₫)</label>
+          <input class="input" name="old_price" type="number" value="<?= htmlspecialchars($product['old_price'] ?? '') ?>"/>
+        </div>
       </div>
 
-      <div style="margin-top:14px">
-        <label>Ảnh hiện tại</label>
-        <?php if (!empty($product['image'])): ?>
-          <div style="margin:8px 0">
-            <img src="public/uploads/<?= htmlspecialchars($product['image']) ?>" style="max-width:220px; border-radius:14px; border:1px solid #e5e7eb" />
-          </div>
-          <div class="small">Upload ảnh mới để thay thế (ảnh cũ sẽ bị xóa).</div>
-        <?php else: ?>
-          <div class="small">Chưa có ảnh.</div>
-        <?php endif; ?>
+      <div class="grid2 mt-8">
+        <div>
+          <label class="label">Giảm giá (%)</label>
+          <input class="input" name="discount_percent" type="number" value="<?= (int)$product['discount_percent'] ?>"/>
+        </div>
+        <div>
+          <label class="label">Tồn kho *</label>
+          <input class="input" name="stock" type="number" required value="<?= (int)$product['stock'] ?>"/>
+        </div>
       </div>
 
-      <div style="margin-top:14px">
-        <label>Chọn ảnh mới (JPG/PNG/WEBP)</label>
-        <input class="input" type="file" name="image" accept="image/png,image/jpeg,image/webp" />
-      </div>
+      <label class="label mt-8">
+        <input type="checkbox" name="is_flash_sale" value="1" <?= ((int)$product['is_flash_sale']===1)?'checked':'' ?>>
+        Flash Sale
+      </label>
 
-      <div style="margin-top:14px">
-        <label>Mô tả</label>
-        <textarea class="input" name="description" rows="4"><?= htmlspecialchars($product['description'] ?? '') ?></textarea>
-      </div>
+      <label class="label mt-8">Ảnh đại diện sản phẩm hiện tại</label>
+      <?php if (!empty($product['thumb_url'])): ?>
+        <div style="margin: 8px 0;">
+          <img src="<?= htmlspecialchars($product['thumb_url']) ?>" alt="Current Thumb" style="max-width: 120px; border: 1px solid #ddd; border-radius: 4px; display: block;">
+        </div>
+      <?php endif; ?>
 
-      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
-        <button class="btn primary" type="submit">Cập nhật</button>
-        <a class="btn" href="index.php?controller=product&action=index">Hủy</a>
+      <label class="label mt-8">Chọn ảnh mới (Có thể chọn nhiều ảnh cùng lúc để thay thế/bổ sung)</label>
+      <input class="input" type="file" name="thumb_url[]" accept="image/*" multiple />
+
+      <div class="row gap mt-16">
+        <button class="btn btn-primary btn-lg" type="submit">Cập nhật</button>
+        <a class="btn btn-lg" href="index.php?c=seller&a=products">Hủy</a>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+  </form>
+</section>
+
+<?php require __DIR__ . '/../shares/footer.php'; ?>

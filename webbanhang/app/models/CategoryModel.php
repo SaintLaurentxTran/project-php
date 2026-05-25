@@ -1,17 +1,15 @@
 <?php
 class CategoryModel {
-  private PDO $pdo;
-
-  public function __construct() {
-    $cfg = require __DIR__ . '/../config/database.php';
-    $dsn = "mysql:host={$cfg['host']};dbname={$cfg['dbname']};charset={$cfg['charset']}";
-    $this->pdo = new PDO($dsn, $cfg['user'], $cfg['pass'], [
-      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-  }
+  public function __construct(private PDO $pdo) {}
 
   public function all(): array {
-    return $this->pdo->query("SELECT * FROM categories ORDER BY id DESC")->fetchAll();
+    return $this->pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
+  }
+
+  public function find(int $id): ?array {
+    $st = $this->pdo->prepare("SELECT * FROM categories WHERE id=?");
+    $st->execute([$id]);
+    $row = $st->fetch();
+    return $row ?: null;
   }
 }

@@ -1,87 +1,121 @@
-<?php include VIEWS_PATH . DIRECTORY_SEPARATOR . 'shared' . DIRECTORY_SEPARATOR . 'header.php'; ?>
+<?php require __DIR__ . '/shares/header.php'; ?>
 
-<div class="jumbotron jumbotron-fluid bg-primary text-white mb-5">
-    <div class="container">
-        <h1 class="display-4">Chào mừng đến với Hệ Thống Quản Lý Sản Phẩm</h1>
-        <p class="lead">Quản lý sản phẩm và danh mục một cách hiệu quả</p>
-    </div>
-</div>
+<section class="container">
+  <!-- HERO SLIDER -->
+  <div class="hero">
+    <div class="hero-overlay"></div>
 
-<div class="row">
-    <div class="col-md-8">
-        <h2 class="mb-4">
-            <i class="fas fa-box"></i> Sản Phẩm Nổi Bật
-        </h2>
-        <?php if (!empty($products)): ?>
-            <div class="row">
-                <?php 
-                $featured_products = array_slice($products, 0, 3);
-                foreach ($featured_products as $product): 
-                ?>
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($product->name, ENT_QUOTES, 'UTF-8'); ?></h5>
-                                <p class="card-text text-muted"><?php echo htmlspecialchars(substr($product->description, 0, 80), ENT_QUOTES, 'UTF-8'); ?>...</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="h5 mb-0 text-success">₫<?php echo number_format($product->price, 0, ',', '.'); ?></span>
-                                    <a href="/webbanhang/Product/show/<?php echo $product->id; ?>" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-eye"></i> Xem
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-            <div class="mt-3">
-                <a href="/webbanhang/Product" class="btn btn-primary btn-lg">
-                    <i class="fas fa-list"></i> Xem Tất Cả Sản Phẩm (<?php echo count($products); ?>)
-                </a>
-            </div>
-        <?php else: ?>
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i> Chưa có sản phẩm nào. 
-                <a href="/webbanhang/Product/add">Tạo sản phẩm mới</a>
-            </div>
-        <?php endif; ?>
+    <div class="hero-slider" data-autoplay="true" data-interval="3500">
+      <div class="hero-slide is-active">
+        <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1600&auto=format&fit=crop" alt="slide 1">
+      </div>
+      <div class="hero-slide">
+        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1600&auto=format&fit=crop" alt="slide 2">
+      </div>
+      <div class="hero-slide">
+        <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?q=80&w=1600&auto=format&fit=crop" alt="slide 3">
+      </div>
+
+      <button class="hero-nav prev" type="button" aria-label="prev">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <button class="hero-nav next" type="button" aria-label="next">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+
+      <div class="hero-dots"></div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card bg-light">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="fas fa-tachometer-alt"></i> Thống Kê
-                </h5>
-                <hr>
-                <div class="mb-3">
-                    <p class="mb-2">
-                        <strong>Tổng Sản Phẩm:</strong>
-                        <span class="badge badge-primary"><?php echo count($products); ?></span>
-                    </p>
-                    <p class="mb-2">
-                        <strong>Danh Mục:</strong>
-                        <span class="badge badge-success"><?php echo count($categories); ?></span>
-                    </p>
-                </div>
-            </div>
+    <div class="hero-content">
+      <span class="pill">SỰ KIỆN 11.11 SIÊU SALE</span>
+      <h1>Lễ Hội Mua Sắm Lớn Nhất Năm</h1>
+      <p>Giảm giá lên đến 90% các mặt hàng công nghệ và thời trang. Miễn phí vận chuyển toàn quốc.</p>
+      <a class="btn btn-primary btn-lg" href="index.php?c=default&a=search">SĂN DEAL NGAY</a>
+    </div>
+  </div>
+</section>
+
+<section class="container">
+  <div class="card">
+    <div class="quick-grid">
+      <?php foreach (array_slice($categories, 0, 8) as $cat): ?>
+        <a class="quick-item hover-lift" href="index.php?c=default&a=search&category_id=<?= (int)$cat['id'] ?>">
+          <div class="quick-icon">
+            <span class="material-symbols-outlined"><?= htmlspecialchars($cat['icon'] ?: 'category') ?></span>
+          </div>
+          <div class="quick-text"><?= htmlspecialchars($cat['name']) ?></div>
+        </a>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+
+<section class="container" id="flash">
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">
+        <h2 class="title-accent">Flash Sale</h2>
+        <div class="countdown" data-countdown="daily"></div>
+      </div>
+      <a class="link" href="index.php?c=default&a=search">Xem tất cả <span class="material-symbols-outlined">chevron_right</span></a>
+    </div>
+
+    <div class="hscroll">
+      <?php foreach ($flash as $p): ?>
+        <a class="flash-card hover-lift" href="index.php?c=product&a=show&id=<?= (int)$p['id'] ?>">
+          <div class="flash-img">
+            <img src="<?= htmlspecialchars($p['thumb_url']) ?>" alt="<?= htmlspecialchars($p['name']) ?>">
+            <?php if ((int)$p['discount_percent'] > 0): ?>
+              <div class="discount-badge">-<?= (int)$p['discount_percent'] ?>%</div>
+            <?php endif; ?>
+          </div>
+          <div class="price"><?= number_format((int)$p['price'], 0, ',', '.') ?>₫</div>
+          <div class="bar">
+            <div class="bar-fill" style="width: <?= min(95, max(15, (int)$p['discount_percent'] * 2)) ?>%"></div>
+            <span class="bar-text">ĐANG BÁN CHẠY</span>
+          </div>
+        </a>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+
+<section class="container">
+  <div class="sticky-title">
+    <h2>Gợi Ý Hôm Nay</h2>
+  </div>
+
+  <div class="grid">
+    <?php foreach ($latest as $p): ?>
+      <a class="product-card hover-lift" href="index.php?c=product&a=show&id=<?= (int)$p['id'] ?>">
+        <div class="pimg">
+          <img src="<?= htmlspecialchars($p['thumb_url']) ?>" alt="<?= htmlspecialchars($p['name']) ?>">
+          <?php if ((int)$p['is_flash_sale'] === 1): ?>
+            <div class="tag">Flash</div>
+          <?php endif; ?>
         </div>
-
-        <div class="card mt-4 bg-light">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="fas fa-bolt"></i> Tùy Chọn Nhanh
-                </h5>
-                <hr>
-                <a href="/webbanhang/Product/add" class="btn btn-success btn-block mb-2">
-                    <i class="fas fa-plus"></i> Thêm Sản Phẩm
-                </a>
-                <a href="/webbanhang/Product" class="btn btn-info btn-block">
-                    <i class="fas fa-list"></i> Danh Sách Sản Phẩm
-                </a>
-            </div>
+        <div class="pbody">
+          <div class="pname"><?= htmlspecialchars($p['name']) ?></div>
+          <div class="prow">
+            <div class="pprice"><?= number_format((int)$p['price'], 0, ',', '.') ?>₫</div>
+            <div class="pcity"><?= htmlspecialchars($p['city']) ?></div>
+          </div>
+          <div class="prate">
+            <span class="material-symbols-outlined filled">star</span>
+            <span class="material-symbols-outlined filled">star</span>
+            <span class="material-symbols-outlined filled">star</span>
+            <span class="material-symbols-outlined filled">star</span>
+            <span class="material-symbols-outlined">star</span>
+            <span class="sold">Đã bán <?= number_format((int)$p['sold_count'], 0, ',', '.') ?></span>
+          </div>
         </div>
-    </div>
-</div>
+      </a>
+    <?php endforeach; ?>
+  </div>
 
-<?php include VIEWS_PATH . DIRECTORY_SEPARATOR . 'shared' . DIRECTORY_SEPARATOR . 'footer.php'; ?>
+  <div class="center mt-24">
+    <a class="btn" href="index.php?c=default&a=search">Xem thêm</a>
+  </div>
+</section>
+
+<?php require __DIR__ . '/shares/footer.php'; ?>

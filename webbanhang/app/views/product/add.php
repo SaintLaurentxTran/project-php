@@ -1,48 +1,77 @@
-<div class="card">
-  <div class="head">
-    <h3>Thêm sản phẩm</h3>
-    <a class="btn" href="index.php?controller=product&action=index">← Quay lại</a>
+<?php require __DIR__ . '/../shares/header.php'; ?>
+
+<section class="container pt-32">
+  <div class="seller-head">
+    <h1>Thêm Sản Phẩm Mới</h1>
+    <a class="btn" href="index.php?c=seller&a=products">Quay lại</a>
   </div>
 
-  <div class="body">
-    <form method="post" enctype="multipart/form-data" action="index.php?controller=product&action=store">
-      <div class="grid" style="grid-template-columns: 1fr 1fr;">
+  <form class="grid2" method="POST" action="index.php?c=seller&a=store" enctype="multipart/form-data">
+    <div class="card">
+      <h3>Thông tin cơ bản</h3>
+
+      <label class="label">Tên sản phẩm *</label>
+      <input class="input" name="name" required placeholder="Ví dụ: Tai nghe Bluetooth..." />
+
+      <div class="grid2 mt-8">
         <div>
-          <label>Danh mục</label>
-          <select name="category_id" required class="input">
-            <option value="">-- Chọn --</option>
-            <?php foreach ($categories as $c): ?>
-              <option value="<?= (int)$c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
+          <label class="label">Danh mục *</label>
+          <select class="input" name="category_id" required>
+            <?php foreach ($categories as $cat): ?>
+              <option value="<?= (int)$cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
             <?php endforeach; ?>
           </select>
         </div>
-
         <div>
-          <label>Giá</label>
-          <input class="input" name="price" type="number" step="0.01" value="0" />
+          <label class="label">Thành phố</label>
+          <input class="input" name="city" value="TP. Hồ Chí Minh"/>
         </div>
       </div>
 
-      <div style="margin-top:14px">
-        <label>Tên sản phẩm</label>
-        <input class="input" name="name" required />
+      <label class="label mt-8">Mô tả *</label>
+      <textarea class="input" name="description" rows="6" required>Demo mô tả sản phẩm...</textarea>
+    </div>
+
+    <div class="card">
+      <h3>Giá & Tồn kho</h3>
+      <div class="grid2">
+        <div>
+          <label class="label">Giá (₫) *</label>
+          <input class="input" name="price" type="number" required value="199000"/>
+        </div>
+        <div>
+          <label class="label">Giá cũ (₫)</label>
+          <input class="input" name="old_price" type="number" value=""/>
+        </div>
       </div>
 
-      <div style="margin-top:14px">
-        <label>Hình ảnh (JPG/PNG/WEBP)</label>
-        <input class="input" type="file" name="image" accept="image/png,image/jpeg,image/webp" />
-        <div class="small" style="margin-top:6px">Có thể bỏ trống nếu chưa có ảnh.</div>
+      <div class="grid2 mt-8">
+        <div>
+          <label class="label">Giảm giá (%)</label>
+          <input class="input" name="discount_percent" type="number" value="0"/>
+        </div>
+        <div>
+          <label class="label">Tồn kho *</label>
+          <input class="input" name="stock" type="number" required value="50"/>
+        </div>
       </div>
 
-      <div style="margin-top:14px">
-        <label>Mô tả</label>
-        <textarea class="input" name="description" rows="4"></textarea>
-      </div>
+      <label class="label mt-8">
+        <input type="checkbox" name="is_flash_sale" value="1"> Flash Sale
+      </label>
 
-      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
-        <button class="btn primary" type="submit">Lưu</button>
-        <a class="btn" href="index.php?controller=product&action=index">Hủy</a>
+      <label class="label mt-8">Chọn các ảnh cho sản phẩm * (Có thể chọn nhiều ảnh cùng lúc)</label>
+      <input class="input" type="file" name="thumb_url[]" accept="image/*" multiple required />
+      
+      <label class="label mt-8">Album ảnh phụ (Tùy chọn bổ sung)</label>
+      <input class="input" type="file" name="gallery[]" accept="image/*" multiple />
+
+      <div class="row gap mt-16">
+        <button class="btn btn-primary btn-lg" type="submit">Đăng sản phẩm</button>
+        <a class="btn btn-lg" href="index.php?c=seller&a=products">Hủy</a>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
+  </form>
+</section>
+
+<?php require __DIR__ . '/../shares/footer.php'; ?>
