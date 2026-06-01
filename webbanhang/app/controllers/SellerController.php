@@ -4,7 +4,9 @@ require_once __DIR__ . '/../models/CategoryModel.php';
 
 class SellerController {
   
-  public function __construct(private PDO $pdo) {}
+  public function __construct(private PDO $pdo) {
+    requireAdmin();
+  }
 
   public function products() {
     $model = new ProductModel($this->pdo);

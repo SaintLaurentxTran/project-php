@@ -38,3 +38,51 @@ function csrf_check(): void {
         exit('CSRF token invalid.');
     }
 }
+
+// ============================
+// AUTH HELPERS
+// ============================
+
+function isLoggedIn(): bool {
+    return !empty($_SESSION['user']);
+}
+
+function isAdmin(): bool {
+    return !empty($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin';
+}
+
+function currentUser(): ?array {
+    return $_SESSION['user'] ?? null;
+}
+
+function requireLogin(): void {
+    if (!isLoggedIn()) {
+        $_SESSION['flash_error'] = 'Vui lòng đăng nhập để tiếp tục.';
+        redirect('index.php?c=auth&a=login');
+    }
+}
+
+function requireAdmin(): void {
+    requireLogin();
+    if (!isAdmin()) {
+        http_response_code(403);
+        exit('Bạn không có quyền truy cập trang này.');
+    }
+}
+
+function avatar_url(?string $avatar): string {
+    if ($avatar && file_exists(__DIR__ . '/../../' . $avatar)) {
+        return $avatar;
+    }
+    return 'public/assets/default_avatar.png';
+}
+
+function flash(string $type = 'success'): ?string {
+    $key = "flash_{$type}";
+    if (!empty($_SESSION[$key])) {
+        $msg = $_SESSION[$key];
+        unset($_SESSION[$key]);
+        return $msg;
+    }
+    return null;
+}

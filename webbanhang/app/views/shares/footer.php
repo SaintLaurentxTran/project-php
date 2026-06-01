@@ -38,5 +38,6 @@
 </footer>
 
 <script src="public/assets/app.js"></script>
+<script src="public/assets/auth.js"></script>
 </body>
 </html>

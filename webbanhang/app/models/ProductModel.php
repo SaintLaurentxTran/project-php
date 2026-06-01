@@ -57,10 +57,19 @@ class ProductModel {
       JOIN categories c ON c.id = p.category_id
       {$whereSql}
       ORDER BY p.created_at DESC
-      LIMIT {$perPage} OFFSET {$offset}
+      LIMIT ? OFFSET ?
     ";
     $st = $this->pdo->prepare($sql);
-    $st->execute($params);
+    
+    // Bind các tham số search (nếu có)
+    foreach ($params as $index => $value) {
+        $st->bindValue($index + 1, $value);
+    }
+    // Bind tham số phân trang dưới dạng INT
+    $st->bindValue(count($params) + 1, $perPage, PDO::PARAM_INT);
+    $st->bindValue(count($params) + 2, $offset, PDO::PARAM_INT);
+    
+    $st->execute();
     $items = $st->fetchAll();
 
     return [

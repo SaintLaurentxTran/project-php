@@ -1,8 +1,10 @@
 <?php
+require_once __DIR__ . '/../../core/helpers.php';
 $cartCount = 0;
 if (!empty($_SESSION['cart'])) {
   foreach ($_SESSION['cart'] as $it) $cartCount += (int)$it['qty'];
 }
+$auth = currentUser();
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -14,8 +16,33 @@ if (!empty($_SESSION['cart'])) {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="public/assets/styles.css">
+  <link rel="stylesheet" href="public/assets/auth.css">
 </head>
 <body>
+
+<?php
+// Hiển thị flash messages
+$flashSuccess = flash('success');
+$flashError   = flash('error');
+if ($flashSuccess || $flashError): ?>
+<div class="flash-container">
+  <?php if ($flashSuccess): ?>
+    <div class="flash flash-success">
+      <span class="material-symbols-outlined">check_circle</span>
+      <?= $flashSuccess ?>
+      <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+    </div>
+  <?php endif; ?>
+  <?php if ($flashError): ?>
+    <div class="flash flash-error">
+      <span class="material-symbols-outlined">error</span>
+      <?= $flashError ?>
+      <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+    </div>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">
@@ -38,18 +65,51 @@ if (!empty($_SESSION['cart'])) {
           <span class="badge"><?= $cartCount ?></span>
         <?php endif; ?>
       </a>
-      <button class="icon-pill" type="button" title="Thông báo">
-        <span class="material-symbols-outlined">notifications</span>
-      </button>
-      <button class="icon-pill" type="button" title="Ngôn ngữ">
-        <span class="material-symbols-outlined">language</span>
-      </button>
 
       <div class="divider"></div>
 
-      <a class="link-btn" href="index.php?c=seller&a=products">Seller Center</a>
-      <button class="link-btn" type="button">Đăng Nhập</button>
-      <button class="btn btn-primary" type="button">Đăng Ký</button>
+      <?php if ($auth): ?>
+        <!-- Đã đăng nhập: hiển thị thông tin người dùng -->
+        <div class="user-menu-wrap">
+          <button class="user-menu-btn" id="userMenuBtn" type="button">
+            <img class="user-avatar-sm" src="<?= e(base_url(avatar_url($auth['avatar']))) ?>" alt="avatar">
+            <span class="user-name-short"><?= e(mb_substr($auth['name'], 0, 15)) ?></span>
+            <span class="material-symbols-outlined" style="font-size:18px">expand_more</span>
+          </button>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-header">
+              <div class="user-dropdown-name"><?= e($auth['name']) ?></div>
+              <div class="user-dropdown-email"><?= e($auth['email']) ?></div>
+              <?php if ($auth['role'] === 'admin'): ?>
+                <span class="role-badge role-admin">Admin</span>
+              <?php else: ?>
+                <span class="role-badge role-user">Thành viên</span>
+              <?php endif; ?>
+            </div>
+            <a class="dropdown-item" href="index.php?c=profile&a=index">
+              <span class="material-symbols-outlined">person</span> Hồ sơ cá nhân
+            </a>
+            <?php if ($auth['role'] === 'admin'): ?>
+            <a class="dropdown-item" href="index.php?c=admin&a=users">
+              <span class="material-symbols-outlined">manage_accounts</span> Quản lý người dùng
+            </a>
+            <?php endif; ?>
+            <?php if (isAdmin()): ?>
+              <a class="dropdown-item" href="index.php?c=seller&a=products">
+                <span class="material-symbols-outlined">storefront</span> Seller Center
+              </a>
+            <?php endif; ?>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item dropdown-logout" href="index.php?c=auth&a=logout">
+              <span class="material-symbols-outlined">logout</span> Đăng Xuất
+            </a>
+          </div>
+        </div>
+      <?php else: ?>
+        <!-- Chưa đăng nhập -->
+        <a class="link-btn" href="index.php?c=auth&a=login">Đăng Nhập</a>
+        <a class="btn btn-primary" href="index.php?c=auth&a=register">Đăng Ký</a>
+      <?php endif; ?>
     </div>
   </div>
 
@@ -59,6 +119,9 @@ if (!empty($_SESSION['cart'])) {
     <a href="index.php?c=default&a=search">Vouchers</a>
     <a href="index.php?c=default&a=search">Global</a>
     <a href="index.php?c=default&a=search">Brand Outlet</a>
+    <?php if (isAdmin()): ?>
+      <a href="index.php?c=admin&a=users" style="color:#ffd700;font-weight:700;">⚙ Admin</a>
+    <?php endif; ?>
   </nav>
 </header>
 
