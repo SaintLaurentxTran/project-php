@@ -26,6 +26,7 @@ class CheckoutController {
     }
 
     $customer = [
+      'user_id' => $_SESSION['user']['id'] ?? null,
       'name' => trim($_POST['name'] ?? 'Nguyễn Văn A'),
       'phone' => trim($_POST['phone'] ?? '090 000 0000'),
       'address' => trim($_POST['address'] ?? '123 Đường Lê Lợi, Quận 1, TP. Hồ Chí Minh')

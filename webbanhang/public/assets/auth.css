@@ -210,6 +210,9 @@
 .stat-num { font-size: 32px; font-weight: 800; color: #ee4d2d; }
 .stat-label { color: #888; font-size: 13px; }
 .admin-search-form { margin-bottom: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.admin-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.admin-search-input { max-width: 360px; }
+.admin-select { max-width: 190px; }
 
 .admin-table-wrap { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); overflow-x: auto; }
 .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -221,6 +224,19 @@
 .action-cell { white-space: nowrap; }
 .inline-form { display: inline; }
 .text-muted { color: #aaa; font-size: 12px; }
+.status-form { margin: 0; }
+.status-select { min-width: 140px; padding: 6px 10px; font-size: 13px; }
+.order-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.detail-row { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid #f1f1f1; color: #666; }
+.detail-row strong { color: #333; text-align: right; }
+.detail-row.total { font-size: 18px; color: #333; }
+.detail-row.total strong { color: #ee4d2d; }
+.detail-address { margin-top: 12px; padding: 14px; border-radius: 8px; background: #f9f9f9; color: #555; line-height: 1.6; }
+.order-status-box { margin-top: 20px; }
+.order-status-box label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #555; }
+.status-update-row { display: flex; gap: 10px; align-items: center; }
+.order-total-box { max-width: 460px; margin: 24px 0 0 auto; }
+.mt-24 { margin-top: 24px; }
 
 .pagination { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
 .page-btn { padding: 8px 14px; background: #fff; border-radius: 8px; border: 1.5px solid #ddd; color: #555; text-decoration: none; font-weight: 600; font-size: 14px; transition: all .15s; }
@@ -230,4 +246,6 @@
   .profile-page { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .admin-page { padding: 0 8px; }
+  .order-detail-grid { grid-template-columns: 1fr; }
+  .order-total-box { max-width: none; }
 }

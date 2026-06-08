@@ -93,6 +93,9 @@ if ($flashSuccess || $flashError): ?>
             <a class="dropdown-item" href="index.php?c=admin&a=users">
               <span class="material-symbols-outlined">manage_accounts</span> Quản lý người dùng
             </a>
+            <a class="dropdown-item" href="index.php?c=admin&a=orders">
+              <span class="material-symbols-outlined">receipt_long</span> Quan ly don hang
+            </a>
             <?php endif; ?>
             <?php if (isAdmin()): ?>
               <a class="dropdown-item" href="index.php?c=seller&a=products">
@@ -121,6 +124,7 @@ if ($flashSuccess || $flashError): ?>
     <a href="index.php?c=default&a=search">Brand Outlet</a>
     <?php if (isAdmin()): ?>
       <a href="index.php?c=admin&a=users" style="color:#ffd700;font-weight:700;">⚙ Admin</a>
+      <a href="index.php?c=admin&a=orders" style="color:#ffd700;font-weight:700;">Don hang</a>
     <?php endif; ?>
   </nav>
 </header>

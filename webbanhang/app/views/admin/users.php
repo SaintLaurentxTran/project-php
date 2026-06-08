@@ -3,7 +3,10 @@
 <div class="admin-page">
   <div class="admin-header">
     <h1>⚙ Quản Lý Người Dùng</h1>
-    <a href="index.php" class="btn btn-outline">← Về Trang Chủ</a>
+    <div class="admin-actions">
+      <a href="index.php?c=admin&a=orders" class="btn btn-outline">Don hang</a>
+      <a href="index.php" class="btn btn-outline">← Về Trang Chủ</a>
+    </div>
   </div>
 
   <!-- Thống kê -->
