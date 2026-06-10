@@ -2,32 +2,32 @@
 
 <section class="container pt-32">
   <div class="seller-head">
-    <h1>Seller Center &bull; Category Management</h1>
+    <h1>Seller Center &bull; Quản lý danh mục</h1>
     <div class="row gap">
       <a class="btn" href="<?= e(url('seller', 'products')) ?>">
-        <span class="material-symbols-outlined">inventory_2</span> San pham
+        <span class="material-symbols-outlined">inventory_2</span> Sản phẩm
       </a>
       <a class="btn btn-primary" href="<?= e(url('seller', 'categoryAdd')) ?>">
-        <span class="material-symbols-outlined">add_box</span> Them danh muc
+        <span class="material-symbols-outlined">add_box</span> Thêm danh mục
       </a>
     </div>
   </div>
 
   <form method="GET" action="<?= e(url('seller', 'categories')) ?>" class="card mb-16">
     <div class="row gap">
-      <input class="input" name="q" value="<?= e($_GET['q'] ?? '') ?>" placeholder="Tim theo ten danh muc hoac icon">
+      <input class="input" name="q" value="<?= e($_GET['q'] ?? '') ?>" placeholder="Tìm theo tên danh mục hoặc icon">
       <button class="btn btn-primary" type="submit">
-        <span class="material-symbols-outlined">search</span> Tim kiem
+        <span class="material-symbols-outlined">search</span> Tìm kiếm
       </button>
       <?php if (!empty($_GET['q'])): ?>
-        <a class="btn" href="<?= e(url('seller', 'categories')) ?>">Xoa loc</a>
+        <a class="btn" href="<?= e(url('seller', 'categories')) ?>">Xóa lọc</a>
       <?php endif; ?>
     </div>
   </form>
 
   <div class="card">
     <div class="table-head seller-table">
-      <div>Danh muc</div><div>Icon</div><div>San pham</div><div>Trang thai</div><div class="right">Thao tac</div>
+      <div>Danh mục</div><div>Icon</div><div>Sản phẩm</div><div>Trạng thái</div><div class="right">Thao tác</div>
     </div>
 
     <?php foreach ($result['items'] as $cat): ?>
@@ -45,16 +45,16 @@
         <div><?= (int)$cat['product_count'] ?></div>
         <div><span class="pill pill-green">Active</span></div>
         <div class="right">
-          <a class="link" href="<?= e(url('seller', 'categoryEdit', ['id' => (int)$cat['id']])) ?>">Sua</a>
+          <a class="link" href="<?= e(url('seller', 'categoryEdit', ['id' => (int)$cat['id']])) ?>">Sửa</a>
           <span class="muted">&bull;</span>
-          <a class="link danger" href="<?= e(url('seller', 'categoryDeleteConfirm', ['id' => (int)$cat['id']])) ?>">Xoa</a>
+          <a class="link danger" href="<?= e(url('seller', 'categoryDeleteConfirm', ['id' => (int)$cat['id']])) ?>">Xóa</a>
         </div>
       </div>
     <?php endforeach; ?>
 
     <?php if (empty($result['items'])): ?>
       <div class="table-row seller-table">
-        <div class="muted">Khong tim thay danh muc nao.</div><div></div><div></div><div></div><div></div>
+        <div class="muted">Không tìm thấy danh mục nào.</div><div></div><div></div><div></div><div></div>
       </div>
     <?php endif; ?>
   </div>

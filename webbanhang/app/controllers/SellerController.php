@@ -26,15 +26,15 @@ class SellerController {
     $q = trim($_GET['q'] ?? '');
     $result = $catModel->paginate($page, 15, $q);
 
-    $pageTitle = "Quan ly danh muc san pham";
+    $pageTitle = "Quản lý danh mục sản phẩm";
     require __DIR__ . '/../views/seller/categories.php';
   }
 
   public function categoryAdd() {
     $category = ['id' => 0, 'name' => '', 'icon' => 'category'];
     $formAction = url('seller', 'categoryStore');
-    $formTitle = "Them danh muc san pham";
-    $submitLabel = "Them danh muc";
+    $formTitle = "Thêm danh mục sản phẩm";
+    $submitLabel = "Thêm danh mục";
     $pageTitle = $formTitle;
     require __DIR__ . '/../views/seller/category_form.php';
   }
@@ -47,13 +47,13 @@ class SellerController {
 
     $data = $this->categoryDataFromPost();
     if ($data['name'] === '') {
-      $_SESSION['flash_error'] = 'Ten danh muc khong duoc de trong.';
+      $_SESSION['flash_error'] = 'Tên danh mục không được để trống.';
       redirect(url('seller', 'categoryAdd'));
     }
 
     $catModel = new CategoryModel($this->pdo);
     $catModel->create($data);
-    $_SESSION['flash_success'] = 'Da them danh muc san pham.';
+    $_SESSION['flash_success'] = 'Đã thêm danh mục sản phẩm.';
     redirect(url('seller', 'categories'));
   }
 
@@ -67,8 +67,8 @@ class SellerController {
     }
 
     $formAction = url('seller', 'categoryUpdate', ['id' => $id]);
-    $formTitle = "Chinh sua danh muc san pham";
-    $submitLabel = "Cap nhat";
+    $formTitle = "Chỉnh sửa danh mục sản phẩm";
+    $submitLabel = "Cập nhật";
     $pageTitle = $formTitle;
     require __DIR__ . '/../views/seller/category_form.php';
   }
@@ -88,12 +88,12 @@ class SellerController {
 
     $data = $this->categoryDataFromPost();
     if ($data['name'] === '') {
-      $_SESSION['flash_error'] = 'Ten danh muc khong duoc de trong.';
+      $_SESSION['flash_error'] = 'Tên danh mục không được để trống.';
       redirect(url('seller', 'categoryEdit', ['id' => $id]));
     }
 
     $catModel->update($id, $data);
-    $_SESSION['flash_success'] = 'Da cap nhat danh muc san pham.';
+    $_SESSION['flash_success'] = 'Đã cập nhật danh mục sản phẩm.';
     redirect(url('seller', 'categories'));
   }
 
@@ -107,7 +107,7 @@ class SellerController {
     }
 
     $productCount = $catModel->productCount($id);
-    $pageTitle = "Xac nhan xoa danh muc";
+    $pageTitle = "Xác nhận xóa danh mục";
     require __DIR__ . '/../views/seller/category_delete_confirm.php';
   }
 
@@ -125,12 +125,12 @@ class SellerController {
     }
 
     if ($catModel->productCount($id) > 0) {
-      $_SESSION['flash_error'] = 'Khong the xoa danh muc dang co san pham.';
+      $_SESSION['flash_error'] = 'Không thể xóa danh mục đang có sản phẩm.';
       redirect(url('seller', 'categories'));
     }
 
     $catModel->delete($id);
-    $_SESSION['flash_success'] = 'Da xoa danh muc san pham.';
+    $_SESSION['flash_success'] = 'Đã xóa danh mục sản phẩm.';
     redirect(url('seller', 'categories'));
   }
 
@@ -288,7 +288,7 @@ class SellerController {
         exit("Product not found");
     }
 
-    $pageTitle = "Xac nhan xoa san pham";
+    $pageTitle = "Xác nhận xóa sản phẩm";
     require __DIR__ . '/../views/seller/delete_confirm.php';
   }
 

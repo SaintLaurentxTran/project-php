@@ -7,9 +7,9 @@
       <div class="otp-icon">
         <span class="material-symbols-outlined">mark_email_unread</span>
       </div>
-      <h1>Xac thuc OTP</h1>
+      <h1>Xác thực OTP</h1>
       <p class="otp-subtitle">
-        Nhap ma gom 6 chu so da duoc gui den email dang ky de kich hoat tai khoan.
+        Nhập mã gồm 6 chữ số đã được gửi đến email đăng ký để kích hoạt tài khoản.
       </p>
       <div class="otp-email"><?= e($email) ?></div>
 
@@ -33,21 +33,21 @@
         </div>
 
         <div class="otp-meta">
-          <span>Con lai <strong id="otpTimer"><?= sprintf('%02d:%02d', intdiv($remainingSeconds, 60), $remainingSeconds % 60) ?></strong></span>
-          <span>Khong nhan duoc ma?</span>
+          <span>Còn lại <strong id="otpTimer"><?= sprintf('%02d:%02d', intdiv($remainingSeconds, 60), $remainingSeconds % 60) ?></strong></span>
+          <span>Không nhận được mã?</span>
         </div>
 
-        <button class="otp-primary" type="submit">Xac thuc</button>
-        <a class="otp-cancel" href="<?= e(url('auth', 'login')) ?>">Huy</a>
+        <button class="otp-primary" type="submit">Xác thực</button>
+        <a class="otp-cancel" href="<?= e(url('auth', 'login')) ?>">Hủy</a>
       </form>
 
       <form method="POST" action="<?= e(url('auth', 'resendOtp')) ?>" class="otp-resend-form">
         <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
         <input type="hidden" name="email" value="<?= e($email) ?>">
-        <button class="otp-resend" id="resendBtn" type="submit" <?= $remainingSeconds > 0 ? 'disabled' : '' ?>>Gui lai ma OTP</button>
+        <button class="otp-resend" id="resendBtn" type="submit" <?= $remainingSeconds > 0 ? 'disabled' : '' ?>>Gửi lại mã OTP</button>
       </form>
 
-      <p class="otp-note">Trong moi truong local, neu mail chua duoc cau hinh SMTP, ma OTP van duoc ghi vao email_log.txt.</p>
+      <p class="otp-note">Trong môi trường local, nếu mail chưa được cấu hình SMTP, mã OTP vẫn được ghi vào email_log.txt.</p>
     </div>
   </div>
 </div>

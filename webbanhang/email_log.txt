@@ -199,3 +199,67 @@ ShopeeFake Team
 [2026-06-10 04:22:46] RESET TO: horewo7079@bncinema.com
 URL: /auth/reset-password?token=725425f0288437fb5092e4a093efa0bdd02a20eda5ed95065e6e3a11feb84ba3
 
+[2026-06-10 10:17:32] OTP TO: horewo7079@bncinema.com
+MAIL_STATUS: SENT
+OTP: 737600
+Xin chào mail10p,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 737600
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-10 10:31:08] RESET TO: horewo7079@bncinema.com
+MAIL_STATUS: SENT
+URL: http://localhost:8080/auth/reset-password?token=3533d829ef6da6101ea15eac073664d810ea4dd9eca1c8dbf6ecc3efc0b7c867
+Xin chao mail10p,
+
+Ban vua yeu cau dat lai mat khau tai khoan ShopeeFake.
+
+Vui long bam vao link sau de tao mat khau moi:
+http://localhost:8080/auth/reset-password?token=3533d829ef6da6101ea15eac073664d810ea4dd9eca1c8dbf6ecc3efc0b7c867
+
+Link co hieu luc trong 1 gio. Neu ban khong yeu cau, vui long bo qua email nay.
+
+ShopeeFake Team
+
+[2026-06-10 10:32:07] RESET TO: horewo7079@bncinema.com
+MAIL_STATUS: SENT
+URL: http://localhost:8080/auth/reset-password?token=7b9702cf410fa1916e47467a50fc64f4ca57b8c134b953ebcf5578cd8e79c421
+Xin chao mail10p,
+
+Ban vua yeu cau dat lai mat khau tai khoan ShopeeFake.
+
+Vui long bam vao link sau de tao mat khau moi:
+http://localhost:8080/auth/reset-password?token=7b9702cf410fa1916e47467a50fc64f4ca57b8c134b953ebcf5578cd8e79c421
+
+Link co hieu luc trong 1 gio. Neu ban khong yeu cau, vui long bo qua email nay.
+
+ShopeeFake Team
+
+[2026-06-10 10:33:35] OTP TO: xomexes234@brixozu.com
+MAIL_STATUS: SENT
+OTP: 133226
+Xin chào user02,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 133226
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-10 10:34:23] RESET TO: xomexes234@brixozu.com
+MAIL_STATUS: SENT
+URL: http://localhost:8080/auth/reset-password?token=fd4610eefa666b9669d841047db6a0719ea63c9a35b076a38cba8a684fc05488
+Xin chao user02,
+
+Ban vua yeu cau dat lai mat khau tai khoan ShopeeFake.
+
+Vui long bam vao link sau de tao mat khau moi:
+http://localhost:8080/auth/reset-password?token=fd4610eefa666b9669d841047db6a0719ea63c9a35b076a38cba8a684fc05488
+
+Link co hieu luc trong 1 gio. Neu ban khong yeu cau, vui long bo qua email nay.
+
+ShopeeFake Team
+

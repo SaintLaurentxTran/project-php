@@ -58,7 +58,7 @@
     </form>
 
     <p class="auth-note">
-      Sau khi dang ky, ban se nhan ma OTP qua email de kich hoat tai khoan.
+      Sau khi đăng ký, bạn sẽ nhận mã OTP qua email để kích hoạt tài khoản.
     </p>
 
     <div class="auth-footer">

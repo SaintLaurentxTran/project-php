@@ -4,7 +4,7 @@
   <div class="admin-header">
     <h1>⚙ Quản Lý Người Dùng</h1>
     <div class="admin-actions">
-      <a href="<?= e(url('admin', 'orders')) ?>" class="btn btn-outline">Don hang</a>
+      <a href="<?= e(url('admin', 'orders')) ?>" class="btn btn-outline">Đơn hàng</a>
       <a href="<?= e(url()) ?>" class="btn btn-outline">← Về Trang Chủ</a>
     </div>
   </div>
@@ -68,22 +68,22 @@
           </td>
           <td>
             <?php if ($u['email_verified_at']): ?>
-              <span class="badge-verified">Da xac thuc</span>
+              <span class="badge-verified">Đã xác thực</span>
               <form method="POST" action="<?= e(url('admin', 'unverifyUserEmail')) ?>" class="inline-form"
-                    onsubmit="return confirm('Bo xac thuc email nguoi dung nay?')">
+                    onsubmit="return confirm('Bỏ xác thực email người dùng này?')">
                 <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
                 <input type="hidden" name="user_id" value="<?= (int)$u['id'] ?>">
-                <button type="submit" class="btn btn-warning btn-sm" title="Bo xac thuc email">
+                <button type="submit" class="btn btn-warning btn-sm" title="Bỏ xác thực email">
                   <span class="material-symbols-outlined">mark_email_unread</span>
                 </button>
               </form>
             <?php else: ?>
-              <span class="badge-unverified">Chua xac thuc</span>
+              <span class="badge-unverified">Chưa xác thực</span>
               <form method="POST" action="<?= e(url('admin', 'verifyUserEmail')) ?>" class="inline-form"
-                    onsubmit="return confirm('Xac thuc email nguoi dung nay?')">
+                    onsubmit="return confirm('Xác thực email người dùng này?')">
                 <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
                 <input type="hidden" name="user_id" value="<?= (int)$u['id'] ?>">
-                <button type="submit" class="btn btn-success btn-sm" title="Xac thuc email">
+                <button type="submit" class="btn btn-success btn-sm" title="Xác thực email">
                   <span class="material-symbols-outlined">mark_email_read</span>
                 </button>
               </form>

@@ -5,7 +5,7 @@
     <h1>Seller Center • Product Management</h1>
     <div class="row gap">
       <a class="btn" href="<?= e(url('seller', 'categories')) ?>">
-        <span class="material-symbols-outlined">category</span> Danh muc
+        <span class="material-symbols-outlined">category</span> Danh mục
       </a>
       <a class="btn btn-primary" href="<?= e(url('seller', 'add')) ?>">
         <span class="material-symbols-outlined">add_box</span> Thêm sản phẩm

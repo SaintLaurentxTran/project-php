@@ -13,8 +13,6 @@ $auth = currentUser();
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <base href="<?= e(base_url('/')) ?>">
   <title><?= htmlspecialchars($pageTitle ?? 'ShopeeFake') ?></title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="<?= e(base_url('public/assets/styles.css')) ?>?v=<?= filemtime(__DIR__ . '/../../../public/assets/styles.css') ?>">
   <link rel="stylesheet" href="<?= e(base_url('public/assets/auth.css')) ?>?v=<?= filemtime(__DIR__ . '/../../../public/assets/auth.css') ?>">
@@ -93,7 +91,7 @@ if ($flashSuccess || $flashError): ?>
               <span class="material-symbols-outlined">manage_accounts</span> Quản lý người dùng
             </a>
             <a class="dropdown-item" href="<?= e(url('admin', 'orders')) ?>">
-              <span class="material-symbols-outlined">receipt_long</span> Quan ly don hang
+              <span class="material-symbols-outlined">receipt_long</span> Quản lý đơn hàng
             </a>
             <?php endif; ?>
             <?php if (isAdmin()): ?>
@@ -101,7 +99,7 @@ if ($flashSuccess || $flashError): ?>
                 <span class="material-symbols-outlined">storefront</span> Seller Center
               </a>
               <a class="dropdown-item" href="<?= e(url('seller', 'categories')) ?>">
-                <span class="material-symbols-outlined">category</span> Danh muc san pham
+                <span class="material-symbols-outlined">category</span> Danh mục sản phẩm
               </a>
             <?php endif; ?>
             <div class="dropdown-divider"></div>
@@ -126,8 +124,8 @@ if ($flashSuccess || $flashError): ?>
     <a href="<?= e(url('default', 'search')) ?>">Brand Outlet</a>
     <?php if (isAdmin()): ?>
       <a href="<?= e(url('admin', 'users')) ?>" style="color:#ffd700;font-weight:700;">⚙ Admin</a>
-      <a href="<?= e(url('admin', 'orders')) ?>" style="color:#ffd700;font-weight:700;">Don hang</a>
-      <a href="<?= e(url('seller', 'categories')) ?>" style="color:#ffd700;font-weight:700;">Danh muc</a>
+      <a href="<?= e(url('admin', 'orders')) ?>" style="color:#ffd700;font-weight:700;">Đơn hàng</a>
+      <a href="<?= e(url('seller', 'categories')) ?>" style="color:#ffd700;font-weight:700;">Danh mục</a>
     <?php endif; ?>
   </nav>
 </header>

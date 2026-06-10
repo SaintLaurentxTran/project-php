@@ -4,7 +4,7 @@
   <div class="admin-header">
     <h1><span class="material-symbols-outlined">receipt_long</span> Quan Ly Don Hang</h1>
     <div class="admin-actions">
-      <a href="<?= e(url('admin', 'users')) ?>" class="btn btn-outline">Nguoi dung</a>
+      <a href="<?= e(url('admin', 'users')) ?>" class="btn btn-outline">Người dùng</a>
       <a href="<?= e(url()) ?>" class="btn btn-outline">Ve trang chu</a>
     </div>
   </div>
@@ -12,11 +12,11 @@
   <div class="admin-stats">
     <div class="stat-card">
       <div class="stat-num"><?= (int)$stats['totalOrders'] ?></div>
-      <div class="stat-label">Tong don hang</div>
+      <div class="stat-label">Tổng đơn hàng</div>
     </div>
     <div class="stat-card">
       <div class="stat-num"><?= (int)$stats['pendingOrders'] ?></div>
-      <div class="stat-label">Cho xu ly</div>
+      <div class="stat-label">Chờ xử lý</div>
     </div>
     <div class="stat-card">
       <div class="stat-num"><?= money_vnd($stats['totalRevenue']) ?></div>
@@ -26,16 +26,16 @@
 
   <form method="GET" action="<?= e(url('admin', 'orders')) ?>" class="admin-search-form">
     <input type="text" name="q" class="form-control admin-search-input"
-           value="<?= e($_GET['q'] ?? '') ?>" placeholder="Tim ma don, ten khach, so dien thoai...">
+           value="<?= e($_GET['q'] ?? '') ?>" placeholder="Tìm mã đơn, tên khách, số điện thoại...">
     <select name="status" class="form-control admin-select">
       <option value="">Tat ca trang thai</option>
       <?php foreach ($statusLabels as $key => $label): ?>
         <option value="<?= e($key) ?>" <?= ($status ?? '') === $key ? 'selected' : '' ?>><?= e($label) ?></option>
       <?php endforeach; ?>
     </select>
-    <button type="submit" class="btn btn-primary">Tim kiem</button>
+    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
     <?php if (!empty($_GET['q']) || !empty($_GET['status'])): ?>
-      <a href="<?= e(url('admin', 'orders')) ?>" class="btn btn-outline">Xoa loc</a>
+      <a href="<?= e(url('admin', 'orders')) ?>" class="btn btn-outline">Xóa lọc</a>
     <?php endif; ?>
   </form>
 
@@ -43,13 +43,13 @@
     <table class="admin-table">
       <thead>
         <tr>
-          <th>Ma don</th>
-          <th>Khach hang</th>
-          <th>Dien thoai</th>
-          <th>Tong tien</th>
-          <th>Thanh toan</th>
-          <th>Trang thai</th>
-          <th>Ngay tao</th>
+          <th>Mã đơn</th>
+          <th>Khách hàng</th>
+          <th>Điện thoại</th>
+          <th>Tổng tiền</th>
+          <th>Thanh toán</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
           <th>Hanh dong</th>
         </tr>
       </thead>
@@ -87,7 +87,7 @@
           </tr>
         <?php endforeach; ?>
         <?php if (empty($result['orders'])): ?>
-          <tr><td colspan="8" style="text-align:center;padding:30px;color:#999">Chua co don hang nao.</td></tr>
+          <tr><td colspan="8" style="text-align:center;padding:30px;color:#999">Chưa có đơn hàng nào.</td></tr>
         <?php endif; ?>
       </tbody>
     </table>

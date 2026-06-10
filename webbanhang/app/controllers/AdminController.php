@@ -85,9 +85,9 @@ class AdminController
 
         try {
             $this->orderModel->updateStatus($id, $status);
-            $_SESSION['flash_success'] = 'Da cap nhat trang thai don hang.';
+            $_SESSION['flash_success'] = 'Đã cập nhật trạng thái đơn hàng.';
         } catch (Throwable $e) {
-            $_SESSION['flash_error'] = 'Khong the cap nhat trang thai don hang.';
+            $_SESSION['flash_error'] = 'Không thể cập nhật trạng thái đơn hàng.';
         }
 
         $back = $_POST['back'] ?? url('admin', 'orders');
@@ -97,11 +97,11 @@ class AdminController
     private function orderStatusLabels(): array
     {
         return [
-            'pending' => 'Cho xu ly',
-            'confirmed' => 'Da xac nhan',
-            'shipping' => 'Dang giao',
-            'completed' => 'Hoan thanh',
-            'canceled' => 'Da huy',
+            'pending' => 'Chờ xử lý',
+            'confirmed' => 'Đã xác nhận',
+            'shipping' => 'Đang giao',
+            'completed' => 'Hoàn thành',
+            'canceled' => 'Đã hủy',
         ];
     }
 
@@ -164,7 +164,7 @@ class AdminController
         $this->userModel->verifyEmail($userId);
         $this->userModel->markEmailVerificationUsedByUserId($userId);
 
-        $_SESSION['flash_success'] = 'Da xac thuc email nguoi dung.';
+        $_SESSION['flash_success'] = 'Đã xác thực email người dùng.';
         redirect(url('admin', 'users'));
     }
 
@@ -178,7 +178,7 @@ class AdminController
         $userId = (int)($_POST['user_id'] ?? 0);
         $this->userModel->unverifyEmail($userId);
 
-        $_SESSION['flash_success'] = 'Da bo xac thuc email nguoi dung.';
+        $_SESSION['flash_success'] = 'Đã bỏ xác thực email người dùng.';
         redirect(url('admin', 'users'));
     }
 

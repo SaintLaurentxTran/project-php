@@ -1,34 +1,41 @@
 <?php require __DIR__ . '/../shares/header.php'; ?>
 
-<div class="auth-page">
-  <div class="auth-card">
+<div class="auth-page reset-flow-page">
+  <div class="auth-card reset-flow-card">
     <div class="auth-logo">
       <a href="<?= e(url()) ?>">ShopeeFake</a>
     </div>
-    <h1 class="auth-title">Quên Mật Khẩu</h1>
-    <p class="auth-subtitle">Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu.</p>
+
+    <div class="reset-flow-icon">
+      <span class="material-symbols-outlined">mark_email_unread</span>
+    </div>
+
+    <h1 class="auth-title">Quên mật khẩu</h1>
+    <p class="auth-subtitle">
+      Nhập email đã đăng ký, hệ thống sẽ gửi Verification Link để bạn đặt lại mật khẩu.
+    </p>
 
     <?php if (!empty($errors)): ?>
       <div class="alert alert-error">
-        <?php foreach ($errors as $e): ?><div><?= htmlspecialchars($e) ?></div><?php endforeach; ?>
+        <?php foreach ($errors as $e): ?><div><?= e($e) ?></div><?php endforeach; ?>
       </div>
     <?php endif; ?>
 
     <form method="POST" action="<?= e(url('auth', 'forgotPassword')) ?>" novalidate>
-      <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
+      <input type="hidden" name="_csrf" value="<?= e(csrf_token()) ?>">
 
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">Email đăng ký</label>
         <input type="email" id="email" name="email" class="form-control"
-               value="<?= htmlspecialchars(old('email')) ?>"
-               placeholder="Nhập địa chỉ email đã đăng ký" required autofocus>
+               value="<?= e(old('email')) ?>"
+               placeholder="tenban@email.com" required autofocus>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-full">Gửi Link Đặt Lại</button>
+      <button type="submit" class="btn btn-primary btn-full">Gửi link đặt lại mật khẩu</button>
     </form>
 
     <div class="auth-footer">
-      <a href="<?= e(url('auth', 'login')) ?>">← Quay lại Đăng Nhập</a>
+      <a href="<?= e(url('auth', 'login')) ?>">Quay lại đăng nhập</a>
     </div>
   </div>
 </div>
