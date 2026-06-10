@@ -9,8 +9,8 @@
     <p class="muted">Cảm ơn bạn đã mua sắm tại ShopeeFake. Đơn hàng của bạn đang được xử lý.</p>
 
     <div class="btnrow">
-      <a class="btn btn-primary btn-lg" href="index.php">Tiếp tục mua sắm</a>
-      <a class="btn btn-lg" href="index.php?c=seller&a=products">Seller Center</a>
+      <a class="btn btn-primary btn-lg" href="<?= e(url()) ?>">Tiếp tục mua sắm</a>
+      <a class="btn btn-lg" href="<?= e(url('seller', 'products')) ?>">Seller Center</a>
     </div>
   </div>
 

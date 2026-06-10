@@ -20,6 +20,120 @@ class SellerController {
     require __DIR__ . '/../views/seller/products.php'; 
   }
 
+  public function categories() {
+    $catModel = new CategoryModel($this->pdo);
+    $page = max(1, (int)($_GET['page'] ?? 1));
+    $q = trim($_GET['q'] ?? '');
+    $result = $catModel->paginate($page, 15, $q);
+
+    $pageTitle = "Quan ly danh muc san pham";
+    require __DIR__ . '/../views/seller/categories.php';
+  }
+
+  public function categoryAdd() {
+    $category = ['id' => 0, 'name' => '', 'icon' => 'category'];
+    $formAction = url('seller', 'categoryStore');
+    $formTitle = "Them danh muc san pham";
+    $submitLabel = "Them danh muc";
+    $pageTitle = $formTitle;
+    require __DIR__ . '/../views/seller/category_form.php';
+  }
+
+  public function categoryStore() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+      redirect(url('seller', 'categories'));
+    }
+    csrf_check();
+
+    $data = $this->categoryDataFromPost();
+    if ($data['name'] === '') {
+      $_SESSION['flash_error'] = 'Ten danh muc khong duoc de trong.';
+      redirect(url('seller', 'categoryAdd'));
+    }
+
+    $catModel = new CategoryModel($this->pdo);
+    $catModel->create($data);
+    $_SESSION['flash_success'] = 'Da them danh muc san pham.';
+    redirect(url('seller', 'categories'));
+  }
+
+  public function categoryEdit() {
+    $id = (int)($_GET['id'] ?? 0);
+    $catModel = new CategoryModel($this->pdo);
+    $category = $catModel->find($id);
+    if (!$category) {
+      http_response_code(404);
+      exit("Category not found");
+    }
+
+    $formAction = url('seller', 'categoryUpdate', ['id' => $id]);
+    $formTitle = "Chinh sua danh muc san pham";
+    $submitLabel = "Cap nhat";
+    $pageTitle = $formTitle;
+    require __DIR__ . '/../views/seller/category_form.php';
+  }
+
+  public function categoryUpdate() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+      redirect(url('seller', 'categories'));
+    }
+    csrf_check();
+
+    $id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
+    $catModel = new CategoryModel($this->pdo);
+    if (!$catModel->find($id)) {
+      http_response_code(404);
+      exit("Category not found");
+    }
+
+    $data = $this->categoryDataFromPost();
+    if ($data['name'] === '') {
+      $_SESSION['flash_error'] = 'Ten danh muc khong duoc de trong.';
+      redirect(url('seller', 'categoryEdit', ['id' => $id]));
+    }
+
+    $catModel->update($id, $data);
+    $_SESSION['flash_success'] = 'Da cap nhat danh muc san pham.';
+    redirect(url('seller', 'categories'));
+  }
+
+  public function categoryDeleteConfirm() {
+    $id = (int)($_GET['id'] ?? 0);
+    $catModel = new CategoryModel($this->pdo);
+    $category = $catModel->find($id);
+    if (!$category) {
+      http_response_code(404);
+      exit("Category not found");
+    }
+
+    $productCount = $catModel->productCount($id);
+    $pageTitle = "Xac nhan xoa danh muc";
+    require __DIR__ . '/../views/seller/category_delete_confirm.php';
+  }
+
+  public function categoryDelete() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+      redirect(url('seller', 'categories'));
+    }
+    csrf_check();
+
+    $id = (int)($_POST['id'] ?? 0);
+    $catModel = new CategoryModel($this->pdo);
+    if (!$catModel->find($id)) {
+      http_response_code(404);
+      exit("Category not found");
+    }
+
+    if ($catModel->productCount($id) > 0) {
+      $_SESSION['flash_error'] = 'Khong the xoa danh muc dang co san pham.';
+      redirect(url('seller', 'categories'));
+    }
+
+    $catModel->delete($id);
+    $_SESSION['flash_success'] = 'Da xoa danh muc san pham.';
+    redirect(url('seller', 'categories'));
+  }
+
   public function add() {
     $catModel = new CategoryModel($this->pdo);
     $categories = $catModel->all();
@@ -164,13 +278,42 @@ class SellerController {
     exit();
   }
 
-  public function delete() {
+  public function deleteConfirm() {
     $id = (int)($_GET['id'] ?? 0);
+    $model = new ProductModel($this->pdo);
+    $product = $model->find($id);
+
+    if (!$product) {
+        http_response_code(404);
+        exit("Product not found");
+    }
+
+    $pageTitle = "Xac nhan xoa san pham";
+    require __DIR__ . '/../views/seller/delete_confirm.php';
+  }
+
+  public function delete() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        redirect(url('seller', 'products'));
+    }
+
+    $id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
     $model = new ProductModel($this->pdo);
     $model->delete($id);
 
     require __DIR__ . '/../views/seller/delete_success.php';
     exit();
+  }
+
+  public function finishCreate() {
+    redirect(url('seller', 'products'));
+  }
+
+  private function categoryDataFromPost(): array {
+    return [
+      'name' => trim($_POST['name'] ?? ''),
+      'icon' => trim($_POST['icon'] ?? ''),
+    ];
   }
 
   private function uploadFileToServer(array $file): string {

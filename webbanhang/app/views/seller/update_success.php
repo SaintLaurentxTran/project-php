@@ -9,8 +9,8 @@
     <p class="muted">Thông tin thay đổi của bạn đã được ghi nhận.</p>
 
     <div class="btnrow">
-      <a class="btn btn-primary" href="index.php?c=seller&a=products">Quay lại danh sách</a>
-      <a class="btn" href="index.php?c=default&a=search">Xem trên shop</a>
+      <a class="btn btn-primary" href="<?= e(url('seller', 'products')) ?>">Quay lại danh sách</a>
+      <a class="btn" href="<?= e(url('default', 'search')) ?>">Xem trên shop</a>
     </div>
   </div>
 </section>

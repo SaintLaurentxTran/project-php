@@ -38,7 +38,7 @@ class CartController {
     }
     $cart[$id]['qty'] += $qty;
 
-    header("Location: index.php?c=cart&a=index");
+    redirect(url('cart', 'index'));
   }
 
   public function updateQty() {
@@ -47,7 +47,7 @@ class CartController {
     $cart = &$this->cartRef();
     if (isset($cart[$id])) $cart[$id]['qty'] = $qty;
 
-    header("Location: index.php?c=cart&a=index");
+    redirect(url('cart', 'index'));
   }
 
   public function remove() {
@@ -55,11 +55,11 @@ class CartController {
     $cart = &$this->cartRef();
     unset($cart[$id]);
 
-    header("Location: index.php?c=cart&a=index");
+    redirect(url('cart', 'index'));
   }
 
   public function clear() {
     $_SESSION['cart'] = [];
-    header("Location: index.php?c=cart&a=index");
+    redirect(url('cart', 'index'));
   }
 }

@@ -9,9 +9,9 @@
     <p class="muted">Sản phẩm đang ở trạng thái hoạt động.</p>
 
     <div class="btnrow">
-      <a class="btn" href="index.php?c=default&a=search">Xem sản phẩm trên shop</a>
-      <a class="btn" href="index.php?c=seller&a=products">Quay lại danh sách</a>
-      <a class="btn btn-primary" href="index.php?c=seller&a=add">Tiếp tục thêm sản phẩm</a>
+      <a class="btn" href="<?= e(url('default', 'search')) ?>">Xem sản phẩm trên shop</a>
+      <a class="btn" href="<?= e(url('seller', 'products')) ?>">Quay lại danh sách</a>
+      <a class="btn btn-primary" href="<?= e(url('seller', 'add')) ?>">Tiếp tục thêm sản phẩm</a>
     </div>
   </div>
 </section>

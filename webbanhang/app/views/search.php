@@ -11,10 +11,10 @@
       <div class="side-card">
         <h4>Theo Danh Mục</h4>
         <div class="side-list">
-          <a class="side-link <?= ((int)($_GET['category_id'] ?? 0) === 0) ? 'active':'' ?>" href="index.php?c=default&a=search&q=<?= urlencode($q) ?>">Tất cả</a>
+          <a class="side-link <?= ((int)($_GET['category_id'] ?? 0) === 0) ? 'active':'' ?>" href="<?= e(url('default', 'search', ['q' => $q])) ?>">Tất cả</a>
           <?php foreach ($categories as $cat): ?>
             <a class="side-link <?= ((int)($_GET['category_id'] ?? 0) === (int)$cat['id']) ? 'active':'' ?>"
-               href="index.php?c=default&a=search&category_id=<?= (int)$cat['id'] ?>&q=<?= urlencode($q) ?>">
+               href="<?= e(url('default', 'search', ['category_id' => (int)$cat['id'], 'q' => $q])) ?>">
               <?= htmlspecialchars($cat['name']) ?>
             </a>
           <?php endforeach; ?>
@@ -31,7 +31,7 @@
         <p class="muted small">(demo: lọc giá chưa bật)</p>
       </div>
 
-      <a class="btn wfull" href="index.php?c=default&a=search">Xóa tất cả</a>
+      <a class="btn wfull" href="<?= e(url('default', 'search')) ?>">Xóa tất cả</a>
     </aside>
 
     <div class="content">
@@ -49,7 +49,7 @@
 
       <div class="grid grid-5">
         <?php foreach ($result['items'] as $p): ?>
-          <a class="product-card hover-lift" href="index.php?c=product&a=show&id=<?= (int)$p['id'] ?>">
+          <a class="product-card hover-lift" href="<?= e(url('product', 'show', ['id' => (int)$p['id']])) ?>">
             <div class="pimg">
               <img src="<?= htmlspecialchars($p['thumb_url']) ?>" alt="<?= htmlspecialchars($p['name']) ?>">
               <?php if ((int)$p['discount_percent'] > 0): ?>
@@ -75,14 +75,12 @@
       </div>
 
       <div class="pagination">
-        <?php
-          $base = "index.php?c=default&a=search&q=" . urlencode($q) . "&category_id=" . (int)$category_id . "&page=";
-        ?>
-        <a class="pagebtn" href="<?= $base . max(1, $result['page']-1) ?>">&laquo;</a>
+        <?php $pageUrl = fn($page) => url('default', 'search', ['q' => $q, 'category_id' => (int)$category_id, 'page' => $page]); ?>
+        <a class="pagebtn" href="<?= e($pageUrl(max(1, $result['page']-1))) ?>">&laquo;</a>
         <?php for ($i=1; $i <= $result['totalPages']; $i++): ?>
-          <a class="pagebtn <?= ($i===$result['page'])?'active':'' ?>" href="<?= $base.$i ?>"><?= $i ?></a>
+          <a class="pagebtn <?= ($i===$result['page'])?'active':'' ?>" href="<?= e($pageUrl($i)) ?>"><?= $i ?></a>
         <?php endfor; ?>
-        <a class="pagebtn" href="<?= $base . min($result['totalPages'], $result['page']+1) ?>">&raquo;</a>
+        <a class="pagebtn" href="<?= e($pageUrl(min($result['totalPages'], $result['page']+1))) ?>">&raquo;</a>
       </div>
     </div>
   </div>

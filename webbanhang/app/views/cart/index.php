@@ -12,7 +12,7 @@
       <span class="material-symbols-outlined big">shopping_cart_off</span>
       <h3>Giỏ hàng của bạn còn trống</h3>
       <p class="muted">Hãy tìm thêm các sản phẩm tuyệt vời nhé!</p>
-      <a class="btn btn-primary" href="index.php">Mua sắm ngay</a>
+      <a class="btn btn-primary" href="<?= e(url()) ?>">Mua sắm ngay</a>
     </div>
   <?php else: ?>
     <div class="card cart-table">
@@ -37,7 +37,7 @@
           <div class="center"><?= number_format((int)$it['price'], 0, ',', '.') ?>₫</div>
 
           <div class="center">
-            <form class="qtyform" method="POST" action="index.php?c=cart&a=updateQty">
+            <form class="qtyform" method="POST" action="<?= e(url('cart', 'updateQty')) ?>">
               <input type="hidden" name="id" value="<?= (int)$it['id'] ?>">
               <div class="qty">
                 <button class="qtybtn" type="button" data-qdelta="-1">-</button>
@@ -51,7 +51,7 @@
           <div class="center price"><?= number_format((int)$line, 0, ',', '.') ?>₫</div>
 
           <div class="right">
-            <form method="POST" action="index.php?c=cart&a=remove">
+            <form method="POST" action="<?= e(url('cart', 'remove')) ?>">
               <input type="hidden" name="id" value="<?= (int)$it['id'] ?>">
               <button class="link danger" type="submit">
                 <span class="material-symbols-outlined">delete</span> Xóa
@@ -63,14 +63,14 @@
     </div>
 
     <div class="cart-footer">
-      <form method="POST" action="index.php?c=cart&a=clear">
+      <form method="POST" action="<?= e(url('cart', 'clear')) ?>">
         <button class="btn" type="submit">Xóa tất cả</button>
       </form>
 
       <div class="totalbox">
         <div class="muted">Tổng thanh toán:</div>
         <div class="total"><?= number_format((int)$sum, 0, ',', '.') ?>₫</div>
-        <a class="btn btn-primary btn-lg" href="index.php?c=checkout&a=index">Mua Hàng</a>
+        <a class="btn btn-primary btn-lg" href="<?= e(url('checkout', 'index')) ?>">Mua Hàng</a>
       </div>
     </div>
   <?php endif; ?>

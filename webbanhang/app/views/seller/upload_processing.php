@@ -32,7 +32,7 @@
     } else {
       clearInterval(t);
       // finalize create (server-side)
-      window.location.href = "index.php?c=seller&a=finishCreate";
+      window.location.href = "<?= e(url('seller', 'finishCreate')) ?>";
     }
   }, 700);
 </script>

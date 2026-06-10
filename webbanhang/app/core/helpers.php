@@ -4,7 +4,43 @@ function base_url(string $path = ''): string {
     $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
     $base = str_replace('/index.php', '', $scriptName);
     $base = rtrim($base, '/');
-    return $base . ($path ? '/' . ltrim($path, '/') : '');
+    if ($path === '') {
+        return $base !== '' ? $base : '/';
+    }
+
+    return ($base !== '' ? $base : '') . '/' . ltrim($path, '/');
+}
+
+function route_slug(string $value): string {
+    $value = preg_replace('/([a-z])([A-Z])/', '$1-$2', $value);
+    return strtolower(str_replace('_', '-', $value));
+}
+
+function route_action(string $slug): string {
+    $slug = str_replace('_', '-', $slug);
+    return preg_replace_callback('/-([a-z])/', fn($m) => strtoupper($m[1]), strtolower($slug));
+}
+
+function url(string $controller = 'default', string $action = 'home', array $params = [], string $fragment = ''): string {
+    $controller = route_slug($controller);
+    $action = route_slug($action);
+
+    if ($controller === 'default' && $action === 'home') {
+        $path = base_url();
+    } else {
+        $path = base_url($controller . '/' . $action);
+    }
+
+    $query = http_build_query(array_filter($params, static fn($value) => $value !== null && $value !== ''), '', '&', PHP_QUERY_RFC3986);
+    return $path . ($query ? '?' . $query : '') . ($fragment ? '#' . ltrim($fragment, '#') : '');
+}
+
+function current_url(array $params = []): string {
+    $controller = $_GET['c'] ?? 'default';
+    $action = $_GET['a'] ?? 'home';
+    $query = array_merge($_GET, $params);
+    unset($query['c'], $query['a']);
+    return url($controller, $action, $query);
 }
 
 function redirect(string $to): void {
@@ -58,7 +94,7 @@ function currentUser(): ?array {
 function requireLogin(): void {
     if (!isLoggedIn()) {
         $_SESSION['flash_error'] = 'Vui lòng đăng nhập để tiếp tục.';
-        redirect('index.php?c=auth&a=login');
+        redirect(url('auth', 'login'));
     }
 }
 

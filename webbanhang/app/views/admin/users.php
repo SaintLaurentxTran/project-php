@@ -4,8 +4,8 @@
   <div class="admin-header">
     <h1>⚙ Quản Lý Người Dùng</h1>
     <div class="admin-actions">
-      <a href="index.php?c=admin&a=orders" class="btn btn-outline">Don hang</a>
-      <a href="index.php" class="btn btn-outline">← Về Trang Chủ</a>
+      <a href="<?= e(url('admin', 'orders')) ?>" class="btn btn-outline">Don hang</a>
+      <a href="<?= e(url()) ?>" class="btn btn-outline">← Về Trang Chủ</a>
     </div>
   </div>
 
@@ -18,14 +18,12 @@
   </div>
 
   <!-- Tìm kiếm -->
-  <form method="GET" action="index.php" class="admin-search-form">
-    <input type="hidden" name="c" value="admin">
-    <input type="hidden" name="a" value="users">
+  <form method="GET" action="<?= e(url('admin', 'users')) ?>" class="admin-search-form">
     <input type="text" name="q" class="form-control" style="display:inline-block;width:300px"
            value="<?= e($_GET['q'] ?? '') ?>" placeholder="Tìm theo tên hoặc email...">
     <button type="submit" class="btn btn-primary">Tìm Kiếm</button>
     <?php if (!empty($_GET['q'])): ?>
-      <a href="index.php?c=admin&a=users" class="btn btn-outline">Xóa Lọc</a>
+      <a href="<?= e(url('admin', 'users')) ?>" class="btn btn-outline">Xóa Lọc</a>
     <?php endif; ?>
   </form>
 
@@ -70,16 +68,32 @@
           </td>
           <td>
             <?php if ($u['email_verified_at']): ?>
-              <span class="badge-verified">✓ Đã xác thực</span>
+              <span class="badge-verified">Da xac thuc</span>
+              <form method="POST" action="<?= e(url('admin', 'unverifyUserEmail')) ?>" class="inline-form"
+                    onsubmit="return confirm('Bo xac thuc email nguoi dung nay?')">
+                <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
+                <input type="hidden" name="user_id" value="<?= (int)$u['id'] ?>">
+                <button type="submit" class="btn btn-warning btn-sm" title="Bo xac thuc email">
+                  <span class="material-symbols-outlined">mark_email_unread</span>
+                </button>
+              </form>
             <?php else: ?>
-              <span class="badge-unverified">✗ Chưa xác thực</span>
+              <span class="badge-unverified">Chua xac thuc</span>
+              <form method="POST" action="<?= e(url('admin', 'verifyUserEmail')) ?>" class="inline-form"
+                    onsubmit="return confirm('Xac thuc email nguoi dung nay?')">
+                <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
+                <input type="hidden" name="user_id" value="<?= (int)$u['id'] ?>">
+                <button type="submit" class="btn btn-success btn-sm" title="Xac thuc email">
+                  <span class="material-symbols-outlined">mark_email_read</span>
+                </button>
+              </form>
             <?php endif; ?>
           </td>
           <td><?= date('d/m/Y', strtotime($u['created_at'])) ?></td>
           <td class="action-cell">
             <?php if ($u['id'] !== (int)$_SESSION['user']['id']): ?>
             <!-- Khóa / Mở khóa -->
-            <form method="POST" action="index.php?c=admin&a=toggleActive" class="inline-form"
+            <form method="POST" action="<?= e(url('admin', 'toggleActive')) ?>" class="inline-form"
                   onsubmit="return confirm('Bạn chắc chắn?')">
               <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
               <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
@@ -91,7 +105,7 @@
             </form>
 
             <!-- Đổi vai trò -->
-            <form method="POST" action="index.php?c=admin&a=changeRole" class="inline-form"
+            <form method="POST" action="<?= e(url('admin', 'changeRole')) ?>" class="inline-form"
                   onsubmit="return confirm('Thay đổi vai trò?')">
               <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
               <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
@@ -104,7 +118,7 @@
             </form>
 
             <!-- Xóa -->
-            <form method="POST" action="index.php?c=admin&a=deleteUser" class="inline-form"
+            <form method="POST" action="<?= e(url('admin', 'deleteUser')) ?>" class="inline-form"
                   onsubmit="return confirm('XÓA tài khoản này? Không thể hoàn tác!')">
               <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
               <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
@@ -129,7 +143,7 @@
   <?php if ($result['totalPages'] > 1): ?>
   <div class="pagination">
     <?php for ($i = 1; $i <= $result['totalPages']; $i++): ?>
-      <a href="index.php?c=admin&a=users&page=<?= $i ?>&q=<?= urlencode($_GET['q'] ?? '') ?>"
+      <a href="<?= e(url('admin', 'users', ['page' => $i, 'q' => $_GET['q'] ?? ''])) ?>"
          class="page-btn <?= $i === $result['page'] ? 'active' : '' ?>">
         <?= $i ?>
       </a>

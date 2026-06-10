@@ -2,9 +2,9 @@
 
 <section class="container pt-32">
   <nav class="breadcrumb">
-    <a href="index.php">Trang chủ</a>
+    <a href="<?= e(url()) ?>">Trang chủ</a>
     <span class="material-symbols-outlined">chevron_right</span>
-    <a href="index.php?c=default&a=search&category_id=<?= (int)$product['category_id'] ?>"><?= htmlspecialchars($product['category_name']) ?></a>
+    <a href="<?= e(url('default', 'search', ['category_id' => (int)$product['category_id']])) ?>"><?= htmlspecialchars($product['category_name']) ?></a>
     <span class="material-symbols-outlined">chevron_right</span>
     <span class="truncate"><?= htmlspecialchars($product['name']) ?></span>
   </nav>
@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <form class="buybox" method="POST" action="index.php?c=cart&a=add">
+      <form class="buybox" method="POST" action="<?= e(url('cart', 'add')) ?>">
         <input type="hidden" name="id" value="<?= (int)$product['id'] ?>">
         <div class="qty">
           <button class="qtybtn" type="button" data-qty="-1">-</button>
@@ -87,7 +87,7 @@
             <span class="material-symbols-outlined">add_shopping_cart</span>
             Thêm Vào Giỏ Hàng
           </button>
-          <a class="btn btn-primary" href="index.php?c=cart&a=index">Mua Ngay</a>
+          <a class="btn btn-primary" href="<?= e(url('cart', 'index')) ?>">Mua Ngay</a>
         </div>
       </form>
 

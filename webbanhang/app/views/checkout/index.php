@@ -60,7 +60,7 @@
         </div>
       </div>
 
-      <form class="card" method="POST" action="index.php?c=checkout&a=placeOrder">
+      <form class="card" method="POST" action="<?= e(url('checkout', 'placeOrder')) ?>">
         <h3>Phương thức thanh toán</h3>
 
         <div class="paygrid">

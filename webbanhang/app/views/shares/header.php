@@ -11,12 +11,13 @@ $auth = currentUser();
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <base href="<?= e(base_url('/')) ?>">
   <title><?= htmlspecialchars($pageTitle ?? 'ShopeeFake') ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="public/assets/styles.css">
-  <link rel="stylesheet" href="public/assets/auth.css">
+  <link rel="stylesheet" href="<?= e(base_url('public/assets/styles.css')) ?>?v=<?= filemtime(__DIR__ . '/../../../public/assets/styles.css') ?>">
+  <link rel="stylesheet" href="<?= e(base_url('public/assets/auth.css')) ?>?v=<?= filemtime(__DIR__ . '/../../../public/assets/auth.css') ?>">
 </head>
 <body>
 
@@ -46,12 +47,10 @@ if ($flashSuccess || $flashError): ?>
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">
-      <a class="brand-title" href="index.php">ShopeeFake</a>
+      <a class="brand-title" href="<?= e(url()) ?>">ShopeeFake</a>
     </div>
 
-    <form class="searchbar" action="index.php" method="GET">
-      <input type="hidden" name="c" value="default">
-      <input type="hidden" name="a" value="search">
+    <form class="searchbar" action="<?= e(url('default', 'search')) ?>" method="GET">
       <input name="q" placeholder="Tìm sản phẩm, thương hiệu và tên shop" value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"/>
       <button type="submit" class="btn btn-primary icon-btn" aria-label="Search">
         <span class="material-symbols-outlined">search</span>
@@ -59,7 +58,7 @@ if ($flashSuccess || $flashError): ?>
     </form>
 
     <div class="actions">
-      <a class="icon-pill" href="index.php?c=cart&a=index" title="Giỏ hàng">
+      <a class="icon-pill" href="<?= e(url('cart', 'index')) ?>" title="Giỏ hàng">
         <span class="material-symbols-outlined">shopping_cart</span>
         <?php if ($cartCount > 0): ?>
           <span class="badge"><?= $cartCount ?></span>
@@ -86,45 +85,49 @@ if ($flashSuccess || $flashError): ?>
                 <span class="role-badge role-user">Thành viên</span>
               <?php endif; ?>
             </div>
-            <a class="dropdown-item" href="index.php?c=profile&a=index">
+            <a class="dropdown-item" href="<?= e(url('profile', 'index')) ?>">
               <span class="material-symbols-outlined">person</span> Hồ sơ cá nhân
             </a>
             <?php if ($auth['role'] === 'admin'): ?>
-            <a class="dropdown-item" href="index.php?c=admin&a=users">
+            <a class="dropdown-item" href="<?= e(url('admin', 'users')) ?>">
               <span class="material-symbols-outlined">manage_accounts</span> Quản lý người dùng
             </a>
-            <a class="dropdown-item" href="index.php?c=admin&a=orders">
+            <a class="dropdown-item" href="<?= e(url('admin', 'orders')) ?>">
               <span class="material-symbols-outlined">receipt_long</span> Quan ly don hang
             </a>
             <?php endif; ?>
             <?php if (isAdmin()): ?>
-              <a class="dropdown-item" href="index.php?c=seller&a=products">
+              <a class="dropdown-item" href="<?= e(url('seller', 'products')) ?>">
                 <span class="material-symbols-outlined">storefront</span> Seller Center
+              </a>
+              <a class="dropdown-item" href="<?= e(url('seller', 'categories')) ?>">
+                <span class="material-symbols-outlined">category</span> Danh muc san pham
               </a>
             <?php endif; ?>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item dropdown-logout" href="index.php?c=auth&a=logout">
+            <a class="dropdown-item dropdown-logout" href="<?= e(url('auth', 'logout')) ?>">
               <span class="material-symbols-outlined">logout</span> Đăng Xuất
             </a>
           </div>
         </div>
       <?php else: ?>
         <!-- Chưa đăng nhập -->
-        <a class="link-btn" href="index.php?c=auth&a=login">Đăng Nhập</a>
-        <a class="btn btn-primary" href="index.php?c=auth&a=register">Đăng Ký</a>
+        <a class="link-btn" href="<?= e(url('auth', 'login')) ?>">Đăng Nhập</a>
+        <a class="btn btn-primary" href="<?= e(url('auth', 'register')) ?>">Đăng Ký</a>
       <?php endif; ?>
     </div>
   </div>
 
   <nav class="navlinks">
-    <a href="index.php#flash">Flash Sale</a>
-    <a href="index.php?c=default&a=search">Live</a>
-    <a href="index.php?c=default&a=search">Vouchers</a>
-    <a href="index.php?c=default&a=search">Global</a>
-    <a href="index.php?c=default&a=search">Brand Outlet</a>
+    <a href="<?= e(url('default', 'home', [], 'flash')) ?>">Flash Sale</a>
+    <a href="<?= e(url('default', 'search')) ?>">Live</a>
+    <a href="<?= e(url('default', 'search')) ?>">Vouchers</a>
+    <a href="<?= e(url('default', 'search')) ?>">Global</a>
+    <a href="<?= e(url('default', 'search')) ?>">Brand Outlet</a>
     <?php if (isAdmin()): ?>
-      <a href="index.php?c=admin&a=users" style="color:#ffd700;font-weight:700;">⚙ Admin</a>
-      <a href="index.php?c=admin&a=orders" style="color:#ffd700;font-weight:700;">Don hang</a>
+      <a href="<?= e(url('admin', 'users')) ?>" style="color:#ffd700;font-weight:700;">⚙ Admin</a>
+      <a href="<?= e(url('admin', 'orders')) ?>" style="color:#ffd700;font-weight:700;">Don hang</a>
+      <a href="<?= e(url('seller', 'categories')) ?>" style="color:#ffd700;font-weight:700;">Danh muc</a>
     <?php endif; ?>
   </nav>
 </header>

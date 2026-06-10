@@ -3,7 +3,7 @@
 <div class="auth-page">
   <div class="auth-card">
     <div class="auth-logo">
-      <a href="index.php">ShopeeFake</a>
+      <a href="<?= e(url()) ?>">ShopeeFake</a>
     </div>
     <h1 class="auth-title">Đặt Lại Mật Khẩu</h1>
 
@@ -13,7 +13,7 @@
       </div>
     <?php endif; ?>
 
-    <form method="POST" action="index.php?c=auth&a=resetPassword&token=<?= urlencode($token) ?>" novalidate>
+    <form method="POST" action="<?= e(url('auth', 'resetPassword', ['token' => $token])) ?>" novalidate>
       <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
 
       <div class="form-group">

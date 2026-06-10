@@ -1,0 +1,201 @@
+[2026-06-10 02:41:16] VERIFY TO: horewo7079@bncinema.com
+URL: /auth/verify-email?token=e07fb3d9e7fdeb5df3756516885a404d37b61ff0ae9ea74b0fa3f618db0d8d4d
+
+[2026-06-10 03:01:30] OTP TO: horewo7079@bncinema.com
+OTP: 798112
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 798112
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:05:58] OTP TO: horewo7079@bncinema.com
+OTP: 438556
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 438556
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:06:48] OTP TO: thanhmoicotoi@gmail.com
+OTP: 914820
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 914820
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:13:46] OTP TO: horewo7079@bncinema.com
+MAIL_STATUS: SENT
+OTP: 383784
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 383784
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:16:29] OTP TO: thanhmoicotoi@gmail.com
+MAIL_STATUS: SENT
+OTP: 410084
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 410084
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:23:31] OTP TO: horewo7079@bncinema.com
+MAIL_STATUS: SMTP_NOT_CONFIGURED
+OTP: 711824
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 711824
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:24:56] OTP TO: thanhmoicotoi@gmail.com
+MAIL_STATUS: SMTP_NOT_CONFIGURED
+OTP: 742448
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 742448
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:54:41] OTP TO: horewo7079@bncinema.com
+MAIL_STATUS: SMTP_NOT_CONFIGURED
+OTP: 884797
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 884797
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:56:29] OTP TO: thanhmoideptry@gmail.com
+MAIL_STATUS: SMTP_NOT_CONFIGURED
+OTP: 424339
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 424339
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:59:13] OTP TO: thanhmoicotoi@gmail.com
+MAIL_STATUS: SENT
+OTP: 000000
+Xin chao SMTP Test,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 000000
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 03:59:49] OTP TO: thanhmoicotoi@gmail.com
+MAIL_STATUS: SENT
+OTP: 111111
+Xin chao SMTP Test,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 111111
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 04:00:15] OTP TO: thanhmoicotoi@gmail.com
+MAIL_STATUS: SENT
+OTP: 222222
+Xin chao SMTP Test,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 222222
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 04:02:20] OTP TO: thanhmoicotoi@gmail.com
+MAIL_STATUS: SENT
+OTP: 444444
+Xin chao SMTP Test,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 444444
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 04:03:50] OTP TO: horewo7079@bncinema.com
+MAIL_STATUS: SENT
+OTP: 747664
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 747664
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 04:06:54] OTP TO: thanhmoideptry@gmail.com
+MAIL_STATUS: SENT
+OTP: 957820
+Xin chao user02,
+
+Ma OTP xac thuc tai khoan ShopeeFake cua ban la: 957820
+
+Ma co hieu luc trong 5 phut.
+
+ShopeeFake Team
+
+[2026-06-10 04:13:36] OTP TO: horewo7079@bncinema.com
+MAIL_STATUS: SENT
+OTP: 633202
+Xin chào user02,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 633202
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-10 04:14:53] OTP TO: horewo7079@bncinema.com
+MAIL_STATUS: SENT
+OTP: 711326
+Xin chào user02,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 711326
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-10 04:16:23] OTP TO: horewo7079@bncinema.com
+MAIL_STATUS: SENT
+OTP: 118400
+Xin chào user02,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 118400
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-10 04:22:46] RESET TO: horewo7079@bncinema.com
+URL: /auth/reset-password?token=725425f0288437fb5092e4a093efa0bdd02a20eda5ed95065e6e3a11feb84ba3
+

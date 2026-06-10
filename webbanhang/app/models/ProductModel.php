@@ -107,6 +107,8 @@ class ProductModel {
 
   // CẬP NHẬT: Thêm trường thumb_url vào câu lệnh SQL INSERT để lưu ảnh đã upload
   public function create(array $data): int {
+    $pricing = $this->calculatePricing($data);
+
     $st = $this->pdo->prepare("
       INSERT INTO products(category_id, name, price, old_price, discount_percent, stock, city, description, is_flash_sale, thumb_url, created_at)
       VALUES(?,?,?,?,?,?,?,?,?,?,NOW())
@@ -114,9 +116,9 @@ class ProductModel {
     $st->execute([
       (int)$data['category_id'],
       $data['name'],
-      (int)$data['price'],
-      $data['old_price'] !== '' ? (int)$data['old_price'] : null,
-      $data['discount_percent'] !== '' ? (int)$data['discount_percent'] : 0,
+      $pricing['price'],
+      $pricing['old_price'],
+      $pricing['discount_percent'],
       (int)$data['stock'],
       $data['city'],
       $data['description'],
@@ -128,6 +130,8 @@ class ProductModel {
 
   // CẬP NHẬT: Thêm trường thumb_url vào câu lệnh SQL UPDATE
   public function update(int $id, array $data): void {
+    $pricing = $this->calculatePricing($data);
+
     $st = $this->pdo->prepare("
       UPDATE products
       SET category_id=?, name=?, price=?, old_price=?, discount_percent=?, stock=?, city=?, description=?, is_flash_sale=?, thumb_url=?
@@ -136,9 +140,9 @@ class ProductModel {
     $st->execute([
       (int)$data['category_id'],
       $data['name'],
-      (int)$data['price'],
-      $data['old_price'] !== '' ? (int)$data['old_price'] : null,
-      $data['discount_percent'] !== '' ? (int)$data['discount_percent'] : 0,
+      $pricing['price'],
+      $pricing['old_price'],
+      $pricing['discount_percent'],
       (int)$data['stock'],
       $data['city'],
       $data['description'],
@@ -146,6 +150,20 @@ class ProductModel {
       $data['thumb_url'],
       $id
     ]);
+  }
+
+  private function calculatePricing(array $data): array {
+    $basePrice = (int)($data['base_price'] ?? $data['old_price'] ?? $data['price'] ?? 0);
+    $basePrice = max(0, $basePrice);
+    $discountPercent = (int)($data['discount_percent'] ?? 0);
+    $discountPercent = max(0, min(100, $discountPercent));
+    $discountedPrice = (int)round($basePrice * (100 - $discountPercent) / 100);
+
+    return [
+      'price' => $discountedPrice,
+      'old_price' => $discountPercent > 0 ? $basePrice : null,
+      'discount_percent' => $discountPercent,
+    ];
   }
 
   public function delete(int $id): void {

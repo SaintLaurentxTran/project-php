@@ -4,8 +4,8 @@
   <div class="admin-header">
     <h1><span class="material-symbols-outlined">receipt_long</span> Quan Ly Don Hang</h1>
     <div class="admin-actions">
-      <a href="index.php?c=admin&a=users" class="btn btn-outline">Nguoi dung</a>
-      <a href="index.php" class="btn btn-outline">Ve trang chu</a>
+      <a href="<?= e(url('admin', 'users')) ?>" class="btn btn-outline">Nguoi dung</a>
+      <a href="<?= e(url()) ?>" class="btn btn-outline">Ve trang chu</a>
     </div>
   </div>
 
@@ -24,9 +24,7 @@
     </div>
   </div>
 
-  <form method="GET" action="index.php" class="admin-search-form">
-    <input type="hidden" name="c" value="admin">
-    <input type="hidden" name="a" value="orders">
+  <form method="GET" action="<?= e(url('admin', 'orders')) ?>" class="admin-search-form">
     <input type="text" name="q" class="form-control admin-search-input"
            value="<?= e($_GET['q'] ?? '') ?>" placeholder="Tim ma don, ten khach, so dien thoai...">
     <select name="status" class="form-control admin-select">
@@ -37,7 +35,7 @@
     </select>
     <button type="submit" class="btn btn-primary">Tim kiem</button>
     <?php if (!empty($_GET['q']) || !empty($_GET['status'])): ?>
-      <a href="index.php?c=admin&a=orders" class="btn btn-outline">Xoa loc</a>
+      <a href="<?= e(url('admin', 'orders')) ?>" class="btn btn-outline">Xoa loc</a>
     <?php endif; ?>
   </form>
 
@@ -69,10 +67,10 @@
             <td class="bold primary"><?= money_vnd($order['total_amount']) ?></td>
             <td><?= e($order['payment_method']) ?></td>
             <td>
-              <form method="POST" action="index.php?c=admin&a=updateOrderStatus" class="status-form">
+              <form method="POST" action="<?= e(url('admin', 'updateOrderStatus')) ?>" class="status-form">
                 <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
                 <input type="hidden" name="order_id" value="<?= (int)$order['id'] ?>">
-                <input type="hidden" name="back" value="index.php?c=admin&a=orders&page=<?= (int)$result['page'] ?>&q=<?= urlencode($_GET['q'] ?? '') ?>&status=<?= urlencode($_GET['status'] ?? '') ?>">
+                <input type="hidden" name="back" value="<?= e(url('admin', 'orders', ['page' => (int)$result['page'], 'q' => $_GET['q'] ?? '', 'status' => $_GET['status'] ?? ''])) ?>">
                 <select name="status" class="form-control status-select" onchange="this.form.submit()">
                   <?php foreach ($statusLabels as $key => $label): ?>
                     <option value="<?= e($key) ?>" <?= $order['status'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
@@ -82,7 +80,7 @@
             </td>
             <td><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></td>
             <td>
-              <a class="btn btn-info btn-sm" href="index.php?c=admin&a=orderDetail&id=<?= (int)$order['id'] ?>">
+              <a class="btn btn-info btn-sm" href="<?= e(url('admin', 'orderDetail', ['id' => (int)$order['id']])) ?>">
                 <span class="material-symbols-outlined">visibility</span> Xem
               </a>
             </td>
@@ -98,7 +96,7 @@
   <?php if ($result['totalPages'] > 1): ?>
     <div class="pagination">
       <?php for ($i = 1; $i <= $result['totalPages']; $i++): ?>
-        <a href="index.php?c=admin&a=orders&page=<?= $i ?>&q=<?= urlencode($_GET['q'] ?? '') ?>&status=<?= urlencode($_GET['status'] ?? '') ?>"
+        <a href="<?= e(url('admin', 'orders', ['page' => $i, 'q' => $_GET['q'] ?? '', 'status' => $_GET['status'] ?? ''])) ?>"
            class="page-btn <?= $i === $result['page'] ? 'active' : '' ?>">
           <?= $i ?>
         </a>

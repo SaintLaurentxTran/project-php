@@ -3,7 +3,7 @@
 <div class="auth-page">
   <div class="auth-card">
     <div class="auth-logo">
-      <a href="index.php">ShopeeFake</a>
+      <a href="<?= e(url()) ?>">ShopeeFake</a>
     </div>
     <h1 class="auth-title">Quên Mật Khẩu</h1>
     <p class="auth-subtitle">Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu.</p>
@@ -14,7 +14,7 @@
       </div>
     <?php endif; ?>
 
-    <form method="POST" action="index.php?c=auth&a=forgotPassword" novalidate>
+    <form method="POST" action="<?= e(url('auth', 'forgotPassword')) ?>" novalidate>
       <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
 
       <div class="form-group">
@@ -28,7 +28,7 @@
     </form>
 
     <div class="auth-footer">
-      <a href="index.php?c=auth&a=login">← Quay lại Đăng Nhập</a>
+      <a href="<?= e(url('auth', 'login')) ?>">← Quay lại Đăng Nhập</a>
     </div>
   </div>
 </div>

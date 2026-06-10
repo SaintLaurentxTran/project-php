@@ -3,7 +3,7 @@
 <div class="auth-page">
   <div class="auth-card">
     <div class="auth-logo">
-      <a href="index.php">ShopeeFake</a>
+      <a href="<?= e(url()) ?>">ShopeeFake</a>
     </div>
     <h1 class="auth-title">Đăng Ký Tài Khoản</h1>
 
@@ -15,7 +15,7 @@
       </div>
     <?php endif; ?>
 
-    <form method="POST" action="index.php?c=auth&a=register" novalidate>
+    <form method="POST" action="<?= e(url('auth', 'register')) ?>" novalidate>
       <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
 
       <div class="form-group">
@@ -58,12 +58,12 @@
     </form>
 
     <p class="auth-note">
-      Sau khi đăng ký, bạn sẽ nhận được email xác thực. Vui lòng kiểm tra hộp thư để kích hoạt tài khoản.
+      Sau khi dang ky, ban se nhan ma OTP qua email de kich hoat tai khoan.
     </p>
 
     <div class="auth-footer">
       Đã có tài khoản?
-      <a href="index.php?c=auth&a=login">Đăng Nhập</a>
+      <a href="<?= e(url('auth', 'login')) ?>">Đăng Nhập</a>
     </div>
   </div>
 </div>

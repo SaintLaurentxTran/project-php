@@ -76,8 +76,7 @@ class ProductController {
     }
 
     // Chuyển hướng về danh sách sau khi thêm thành công
-    header("Location: index.php?c=product&a=list");
-    exit();
+    redirect(url('product', 'list'));
   }
 
   // 3. HIỂN THỊ FORM CHỈNH SỬA SẢN PHẨM
@@ -117,8 +116,7 @@ class ProductController {
 
     $model->update($id, $data);
 
-    header("Location: index.php?c=product&a=list");
-    exit();
+    redirect(url('product', 'list'));
   }
 
   /**

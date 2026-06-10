@@ -30,7 +30,7 @@
       <span class="pill">SỰ KIỆN 11.11 SIÊU SALE</span>
       <h1>Lễ Hội Mua Sắm Lớn Nhất Năm</h1>
       <p>Giảm giá lên đến 90% các mặt hàng công nghệ và thời trang. Miễn phí vận chuyển toàn quốc.</p>
-      <a class="btn btn-primary btn-lg" href="index.php?c=default&a=search">SĂN DEAL NGAY</a>
+      <a class="btn btn-primary btn-lg" href="<?= e(url('default', 'search')) ?>">SĂN DEAL NGAY</a>
     </div>
   </div>
 </section>
@@ -39,7 +39,7 @@
   <div class="card">
     <div class="quick-grid">
       <?php foreach (array_slice($categories, 0, 8) as $cat): ?>
-        <a class="quick-item hover-lift" href="index.php?c=default&a=search&category_id=<?= (int)$cat['id'] ?>">
+        <a class="quick-item hover-lift" href="<?= e(url('default', 'search', ['category_id' => (int)$cat['id']])) ?>">
           <div class="quick-icon">
             <span class="material-symbols-outlined"><?= htmlspecialchars($cat['icon'] ?: 'category') ?></span>
           </div>
@@ -57,12 +57,12 @@
         <h2 class="title-accent">Flash Sale</h2>
         <div class="countdown" data-countdown="daily"></div>
       </div>
-      <a class="link" href="index.php?c=default&a=search">Xem tất cả <span class="material-symbols-outlined">chevron_right</span></a>
+      <a class="link" href="<?= e(url('default', 'search')) ?>">Xem tất cả <span class="material-symbols-outlined">chevron_right</span></a>
     </div>
 
     <div class="hscroll">
       <?php foreach ($flash as $p): ?>
-        <a class="flash-card hover-lift" href="index.php?c=product&a=show&id=<?= (int)$p['id'] ?>">
+        <a class="flash-card hover-lift" href="<?= e(url('product', 'show', ['id' => (int)$p['id']])) ?>">
           <div class="flash-img">
             <img src="<?= htmlspecialchars($p['thumb_url']) ?>" alt="<?= htmlspecialchars($p['name']) ?>">
             <?php if ((int)$p['discount_percent'] > 0): ?>
@@ -87,7 +87,7 @@
 
   <div class="grid">
     <?php foreach ($latest as $p): ?>
-      <a class="product-card hover-lift" href="index.php?c=product&a=show&id=<?= (int)$p['id'] ?>">
+      <a class="product-card hover-lift" href="<?= e(url('product', 'show', ['id' => (int)$p['id']])) ?>">
         <div class="pimg">
           <img src="<?= htmlspecialchars($p['thumb_url']) ?>" alt="<?= htmlspecialchars($p['name']) ?>">
           <?php if ((int)$p['is_flash_sale'] === 1): ?>
@@ -114,7 +114,7 @@
   </div>
 
   <div class="center mt-24">
-    <a class="btn" href="index.php?c=default&a=search">Xem thêm</a>
+    <a class="btn" href="<?= e(url('default', 'search')) ?>">Xem thêm</a>
   </div>
 </section>
 

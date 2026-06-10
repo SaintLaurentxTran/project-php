@@ -40,6 +40,13 @@ class UserModel
         )->execute([$userId]);
     }
 
+    public function unverifyEmail(int $userId): void
+    {
+        $this->pdo->prepare(
+            "UPDATE users SET email_verified_at=NULL, updated_at=NOW() WHERE id=?"
+        )->execute([$userId]);
+    }
+
     // Cập nhật mật khẩu
     public function updatePassword(int $userId, string $newPassword): void
     {
@@ -199,6 +206,40 @@ class UserModel
         )->execute([$userId, $token]);
     }
 
+    public function createEmailOtp(int $userId, string $otpHash): void
+    {
+        $this->pdo->prepare("DELETE FROM email_verifications WHERE user_id=?")->execute([$userId]);
+        $this->pdo->prepare(
+            "INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))"
+        )->execute([$userId, $otpHash]);
+    }
+
+    public function findPendingEmailVerificationByUserId(int $userId): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT ev.*, u.email, u.name
+             FROM email_verifications ev
+             JOIN users u ON u.id = ev.user_id
+             WHERE ev.user_id=? AND ev.used=0 AND ev.expires_at > NOW()
+             LIMIT 1"
+        );
+        $stmt->execute([$userId]);
+        return $stmt->fetch() ?: null;
+    }
+
+    public function findPendingEmailVerificationByEmail(string $email): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT ev.*, u.email, u.name
+             FROM email_verifications ev
+             JOIN users u ON u.id = ev.user_id
+             WHERE u.email=? AND ev.used=0 AND ev.expires_at > NOW()
+             LIMIT 1"
+        );
+        $stmt->execute([$email]);
+        return $stmt->fetch() ?: null;
+    }
+
     public function findEmailVerification(string $token): ?array
     {
         $stmt = $this->pdo->prepare(
@@ -213,5 +254,12 @@ class UserModel
         $this->pdo->prepare(
             "UPDATE email_verifications SET used=1 WHERE token=?"
         )->execute([$token]);
+    }
+
+    public function markEmailVerificationUsedByUserId(int $userId): void
+    {
+        $this->pdo->prepare(
+            "UPDATE email_verifications SET used=1 WHERE user_id=? AND used=0"
+        )->execute([$userId]);
     }
 }

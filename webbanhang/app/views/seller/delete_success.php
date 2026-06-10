@@ -8,10 +8,10 @@
     <h2>Xóa sản phẩm thành công!</h2>
     <p class="muted">Sản phẩm đã được gỡ khỏi cửa hàng của bạn.</p>
     <div class="btnrow">
-      <a class="btn btn-primary" href="index.php?c=seller&a=products">
+      <a class="btn btn-primary" href="<?= e(url('seller', 'products')) ?>">
         <span class="material-symbols-outlined">arrow_back</span> Quay lại danh sách
       </a>
-      <a class="btn" href="index.php?c=seller&a=add">
+      <a class="btn" href="<?= e(url('seller', 'add')) ?>">
         <span class="material-symbols-outlined">add_box</span> Đăng sản phẩm mới
       </a>
     </div>

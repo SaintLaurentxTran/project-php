@@ -11,7 +11,7 @@ class CheckoutController {
   public function index() {
     $cartItems = $this->getCartItems();
     if (count($cartItems) === 0) {
-      header("Location: index.php?c=cart&a=index");
+      redirect(url('cart', 'index'));
       return;
     }
     $pageTitle = "ShopeeFake - Thanh toán";
@@ -21,7 +21,7 @@ class CheckoutController {
   public function placeOrder() {
     $cartItems = $this->getCartItems();
     if (count($cartItems) === 0) {
-      header("Location: index.php?c=cart&a=index");
+      redirect(url('cart', 'index'));
       return;
     }
 
@@ -43,7 +43,7 @@ class CheckoutController {
     // clear cart after successful order
     $_SESSION['cart'] = [];
 
-    header("Location: index.php?c=checkout&a=success&id=" . $orderId);
+    redirect(url('checkout', 'success', ['id' => $orderId]));
   }
 
   public function success() {

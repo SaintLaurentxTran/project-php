@@ -10,7 +10,7 @@
                 <div class="mb-3">
                     <img src="<?= e(base_url(avatar_url($user['avatar']))) ?>" alt="Avatar" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid #ee4d2d; display: block; margin: 0 auto;">
                 </div>
-                <form action="index.php?c=profile&a=uploadAvatar" method="POST" enctype="multipart/form-data">
+                <form action="<?= e(url('profile', 'uploadAvatar')) ?>" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
                     <input type="file" name="avatar" accept="image/*" required style="font-size: 12px; margin-bottom: 10px;">
                     <button type="submit" class="btn btn-outline" style="padding: 5px 15px; font-size: 12px;">Đổi ảnh</button>
@@ -19,7 +19,7 @@
 
             <!-- Bên phải: Form thông tin -->
             <div style="flex: 2; min-width: 300px;">
-                <form action="index.php?c=profile&a=update" method="POST">
+                <form action="<?= e(url('profile', 'update')) ?>" method="POST">
                     <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
                     
                     <div class="form-group">
@@ -48,7 +48,7 @@
                 <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
                 
                 <h3 style="font-size: 18px; margin-bottom: 15px;">Đổi mật khẩu</h3>
-                <form action="index.php?c=profile&a=changePassword" method="POST">
+                <form action="<?= e(url('profile', 'changePassword')) ?>" method="POST">
                     <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
                     
                     <div class="form-group">

@@ -3,7 +3,7 @@
 <div class="admin-page">
   <div class="admin-header">
     <h1><span class="material-symbols-outlined">receipt_long</span> Don hang <?= e($order['order_code']) ?></h1>
-    <a href="index.php?c=admin&a=orders" class="btn btn-outline">Ve danh sach</a>
+    <a href="<?= e(url('admin', 'orders')) ?>" class="btn btn-outline">Ve danh sach</a>
   </div>
 
   <div class="order-detail-grid">
@@ -17,10 +17,10 @@
         <div class="detail-row"><span>Tai khoan</span><strong><?= e($order['user_email']) ?></strong></div>
       <?php endif; ?>
 
-      <form method="POST" action="index.php?c=admin&a=updateOrderStatus" class="order-status-box">
+      <form method="POST" action="<?= e(url('admin', 'updateOrderStatus')) ?>" class="order-status-box">
         <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
         <input type="hidden" name="order_id" value="<?= (int)$order['id'] ?>">
-        <input type="hidden" name="back" value="index.php?c=admin&a=orderDetail&id=<?= (int)$order['id'] ?>">
+        <input type="hidden" name="back" value="<?= e(url('admin', 'orderDetail', ['id' => (int)$order['id']])) ?>">
         <label for="status">Cap nhat trang thai</label>
         <div class="status-update-row">
           <select id="status" name="status" class="form-control">

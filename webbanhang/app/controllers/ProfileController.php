@@ -16,7 +16,7 @@ class ProfileController
     {
         if (empty($_SESSION['user'])) {
             $_SESSION['flash_error'] = 'Vui lòng đăng nhập để tiếp tục.';
-            redirect('index.php?c=auth&a=login');
+            redirect(url('auth', 'login'));
         }
     }
 
@@ -36,7 +36,7 @@ class ProfileController
     public function update(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('index.php?c=profile&a=index');
+            redirect(url('profile', 'index'));
         }
         csrf_check();
 
@@ -53,7 +53,7 @@ class ProfileController
             // Cập nhật session
             $_SESSION['user']['name'] = $name;
             $_SESSION['flash_success'] = 'Cập nhật hồ sơ thành công!';
-            redirect('index.php?c=profile&a=index');
+            redirect(url('profile', 'index'));
         }
 
         $user = $this->userModel->findById((int)$_SESSION['user']['id']);
@@ -67,7 +67,7 @@ class ProfileController
     public function changePassword(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('index.php?c=profile&a=index');
+            redirect(url('profile', 'index'));
         }
         csrf_check();
 
@@ -92,7 +92,7 @@ class ProfileController
             $_SESSION['flash_error'] = implode('<br>', $errors);
         }
 
-        redirect('index.php?c=profile&a=index');
+        redirect(url('profile', 'index'));
     }
 
     // ============================
@@ -101,7 +101,7 @@ class ProfileController
     public function uploadAvatar(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('index.php?c=profile&a=index');
+            redirect(url('profile', 'index'));
         }
         csrf_check();
 
@@ -154,6 +154,6 @@ class ProfileController
             $_SESSION['flash_error'] = implode('<br>', $errors);
         }
 
-        redirect('index.php?c=profile&a=index');
+        redirect(url('profile', 'index'));
     }
 }

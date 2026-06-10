@@ -19,7 +19,7 @@ class AdminController
     {
         if (empty($_SESSION['user'])) {
             $_SESSION['flash_error'] = 'Vui lòng đăng nhập.';
-            redirect('index.php?c=auth&a=login');
+            redirect(url('auth', 'login'));
         }
         if ($_SESSION['user']['role'] !== 'admin') {
             http_response_code(403);
@@ -76,7 +76,7 @@ class AdminController
     public function updateOrderStatus(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('index.php?c=admin&a=orders');
+            redirect(url('admin', 'orders'));
         }
         csrf_check();
 
@@ -90,7 +90,7 @@ class AdminController
             $_SESSION['flash_error'] = 'Khong the cap nhat trang thai don hang.';
         }
 
-        $back = $_POST['back'] ?? 'index.php?c=admin&a=orders';
+        $back = $_POST['back'] ?? url('admin', 'orders');
         redirect($back);
     }
 
@@ -111,7 +111,7 @@ class AdminController
     public function toggleActive(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('index.php?c=admin&a=users');
+            redirect(url('admin', 'users'));
         }
         csrf_check();
 
@@ -121,13 +121,13 @@ class AdminController
         // Không cho khóa chính mình
         if ($userId === (int)$_SESSION['user']['id']) {
             $_SESSION['flash_error'] = 'Không thể tự khóa tài khoản của mình.';
-            redirect('index.php?c=admin&a=users');
+            redirect(url('admin', 'users'));
         }
 
         $this->userModel->setActive($userId, $status);
         $msg = $status ? 'Đã mở khóa tài khoản.' : 'Đã khóa tài khoản.';
         $_SESSION['flash_success'] = $msg;
-        redirect('index.php?c=admin&a=users');
+        redirect(url('admin', 'users'));
     }
 
     // ============================
@@ -136,7 +136,7 @@ class AdminController
     public function changeRole(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('index.php?c=admin&a=users');
+            redirect(url('admin', 'users'));
         }
         csrf_check();
 
@@ -145,12 +145,41 @@ class AdminController
 
         if ($userId === (int)$_SESSION['user']['id']) {
             $_SESSION['flash_error'] = 'Không thể thay đổi vai trò của chính mình.';
-            redirect('index.php?c=admin&a=users');
+            redirect(url('admin', 'users'));
         }
 
         $this->userModel->setRole($userId, $role);
         $_SESSION['flash_success'] = 'Đã cập nhật vai trò người dùng.';
-        redirect('index.php?c=admin&a=users');
+        redirect(url('admin', 'users'));
+    }
+
+    public function verifyUserEmail(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect(url('admin', 'users'));
+        }
+        csrf_check();
+
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $this->userModel->verifyEmail($userId);
+        $this->userModel->markEmailVerificationUsedByUserId($userId);
+
+        $_SESSION['flash_success'] = 'Da xac thuc email nguoi dung.';
+        redirect(url('admin', 'users'));
+    }
+
+    public function unverifyUserEmail(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect(url('admin', 'users'));
+        }
+        csrf_check();
+
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $this->userModel->unverifyEmail($userId);
+
+        $_SESSION['flash_success'] = 'Da bo xac thuc email nguoi dung.';
+        redirect(url('admin', 'users'));
     }
 
     // ============================
@@ -159,7 +188,7 @@ class AdminController
     public function deleteUser(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('index.php?c=admin&a=users');
+            redirect(url('admin', 'users'));
         }
         csrf_check();
 
@@ -167,11 +196,11 @@ class AdminController
 
         if ($userId === (int)$_SESSION['user']['id']) {
             $_SESSION['flash_error'] = 'Không thể xóa tài khoản của chính mình.';
-            redirect('index.php?c=admin&a=users');
+            redirect(url('admin', 'users'));
         }
 
         $this->userModel->delete($userId);
         $_SESSION['flash_success'] = 'Đã xóa tài khoản người dùng.';
-        redirect('index.php?c=admin&a=users');
+        redirect(url('admin', 'users'));
     }
 }

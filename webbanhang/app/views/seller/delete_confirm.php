@@ -13,8 +13,8 @@
       </p>
 
       <div class="modal-actions">
-        <a class="btn" href="index.php?c=seller&a=products">Hủy</a>
-        <form method="POST" action="index.php?c=seller&a=delete">
+        <a class="btn" href="<?= e(url('seller', 'products')) ?>">Hủy</a>
+        <form method="POST" action="<?= e(url('seller', 'delete')) ?>">
           <input type="hidden" name="id" value="<?= (int)$product['id'] ?>">
           <button class="btn btn-danger" type="submit">Xác nhận xóa</button>
         </form>

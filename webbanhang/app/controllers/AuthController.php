@@ -33,15 +33,14 @@ class AuthController
 
             if (!$errors) {
                 $userId = $this->userModel->create($name, $email, $password);
-                $token  = bin2hex(random_bytes(32));
-                $this->userModel->createEmailVerification($userId, $token);
+                $otp = $this->generateOtp();
+                $this->userModel->createEmailOtp($userId, $this->hashOtp($otp));
 
-                // Gửi email xác thực (giả lập - in ra link)
-                $verifyUrl = base_url("index.php?c=auth&a=verifyEmail&token={$token}");
-                $this->sendVerificationEmail($email, $name, $verifyUrl);
+                $this->sendOtpEmail($email, $name, $otp);
+                $_SESSION['pending_verification_email'] = $email;
 
-                $_SESSION['flash_success'] = "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.";
-                redirect('index.php?c=auth&a=login');
+                $_SESSION['flash_success'] = "Dang ky thanh cong! Vui long nhap ma OTP da gui den email.";
+                redirect(url('auth', 'verifyOtp', ['email' => $email]));
             }
 
             $pageTitle = 'Đăng Ký';
@@ -60,7 +59,7 @@ class AuthController
     public function login(): void
     {
         if (!empty($_SESSION['user'])) {
-            redirect('index.php');
+            redirect(url());
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -75,8 +74,15 @@ class AuthController
 
             if (!$user || !$this->userModel->verifyPassword($user, $password)) {
                 $errors[] = 'Email hoặc mật khẩu không đúng.';
+            } elseif (empty($user['email_verified_at'])) {
+                $otp = $this->generateOtp();
+                $this->userModel->createEmailOtp((int)$user['id'], $this->hashOtp($otp));
+                $this->sendOtpEmail($user['email'], $user['name'], $otp);
+                $_SESSION['pending_verification_email'] = $user['email'];
+                $_SESSION['flash_error'] = 'Tai khoan chua kich hoat. Vui long nhap ma OTP vua gui den email.';
+                redirect(url('auth', 'verifyOtp', ['email' => $user['email']]));
             } elseif (!$user['is_active']) {
-                $errors[] = 'Tài khoản chưa được kích hoạt. Vui lòng xác thực email hoặc liên hệ quản trị viên.';
+                $errors[] = 'Tai khoan cua ban dang bi khoa. Vui long lien he quan tri vien.';
             }
 
             if (!$errors) {
@@ -96,7 +102,7 @@ class AuthController
                 }
 
                 $_SESSION['flash_success'] = "Chào mừng, {$user['name']}!";
-                redirect('index.php');
+                redirect(url());
             }
 
             $pageTitle = 'Đăng Nhập';
@@ -119,7 +125,7 @@ class AuthController
         }
         setcookie('remember_token', '', time() - 3600, '/');
         session_destroy();
-        redirect('index.php?c=auth&a=login');
+        redirect(url('auth', 'login'));
     }
 
     // ============================
@@ -132,14 +138,77 @@ class AuthController
 
         if (!$record) {
             $_SESSION['flash_error'] = 'Link xác thực không hợp lệ hoặc đã hết hạn.';
-            redirect('index.php?c=auth&a=login');
+            redirect(url('auth', 'login'));
         }
 
         $this->userModel->verifyEmail((int)$record['user_id']);
         $this->userModel->markEmailVerificationUsed($token);
 
         $_SESSION['flash_success'] = 'Xác thực email thành công! Bạn có thể đăng nhập.';
-        redirect('index.php?c=auth&a=login');
+        redirect(url('auth', 'login'));
+    }
+
+    public function verifyOtp(): void
+    {
+        $email = trim($_GET['email'] ?? $_POST['email'] ?? $_SESSION['pending_verification_email'] ?? '');
+        $record = $email !== '' ? $this->userModel->findPendingEmailVerificationByEmail($email) : null;
+
+        if (!$record) {
+            $_SESSION['flash_error'] = 'Ma OTP khong hop le hoac da het han. Vui long dang ky/dang nhap lai de nhan ma moi.';
+            redirect(url('auth', 'login'));
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            csrf_check();
+            $otp = $this->otpFromPost();
+            $errors = [];
+
+            if (!preg_match('/^\d{6}$/', $otp)) {
+                $errors[] = 'Vui long nhap day du 6 chu so OTP.';
+            } elseif (!hash_equals((string)$record['token'], $this->hashOtp($otp))) {
+                $errors[] = 'Ma OTP khong dung. Vui long kiem tra lai email cua ban.';
+            }
+
+            if (!$errors) {
+                $this->userModel->verifyEmail((int)$record['user_id']);
+                $this->userModel->markEmailVerificationUsedByUserId((int)$record['user_id']);
+                unset($_SESSION['pending_verification_email']);
+
+                $_SESSION['flash_success'] = 'Xac thuc OTP thanh cong! Ban co the dang nhap.';
+                redirect(url('auth', 'login'));
+            }
+        } else {
+            $errors = [];
+        }
+
+        $_SESSION['pending_verification_email'] = $email;
+        $expiresAt = strtotime($record['expires_at']);
+        $remainingSeconds = max(0, $expiresAt - time());
+        $pageTitle = 'Xac thuc OTP';
+        require __DIR__ . '/../views/auth/verify_otp.php';
+    }
+
+    public function resendOtp(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect(url('auth', 'login'));
+        }
+        csrf_check();
+
+        $email = trim($_POST['email'] ?? $_SESSION['pending_verification_email'] ?? '');
+        $user = $email !== '' ? $this->userModel->findByEmail($email) : null;
+
+        if (!$user || (int)$user['is_active'] === 1 || !empty($user['email_verified_at'])) {
+            $_SESSION['flash_error'] = 'Khong the gui lai OTP cho tai khoan nay.';
+            redirect(url('auth', 'login'));
+        }
+
+        $otp = $this->generateOtp();
+        $this->userModel->createEmailOtp((int)$user['id'], $this->hashOtp($otp));
+        $this->sendOtpEmail($user['email'], $user['name'], $otp);
+        $_SESSION['pending_verification_email'] = $user['email'];
+        $_SESSION['flash_success'] = 'Da gui lai ma OTP moi. Vui long kiem tra email cua ban.';
+        redirect(url('auth', 'verifyOtp', ['email' => $user['email']]));
     }
 
     // ============================
@@ -162,12 +231,12 @@ class AuthController
                 if ($user) {
                     $token = bin2hex(random_bytes(32));
                     $this->userModel->createPasswordReset($email, $token);
-                    $resetUrl = base_url("index.php?c=auth&a=resetPassword&token={$token}");
+                    $resetUrl = url('auth', 'resetPassword', ['token' => $token]);
                     $this->sendResetEmail($email, $user['name'], $resetUrl);
                 }
                 // Luôn hiện thông báo thành công (bảo mật - không tiết lộ email tồn tại)
                 $_SESSION['flash_success'] = 'Nếu email tồn tại, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu.';
-                redirect('index.php?c=auth&a=forgotPassword');
+                redirect(url('auth', 'forgotPassword'));
             }
 
             $pageTitle = 'Quên Mật Khẩu';
@@ -190,7 +259,7 @@ class AuthController
 
         if (!$record) {
             $_SESSION['flash_error'] = 'Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.';
-            redirect('index.php?c=auth&a=forgotPassword');
+            redirect(url('auth', 'forgotPassword'));
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -209,7 +278,7 @@ class AuthController
                     $this->userModel->updatePassword((int)$user['id'], $password);
                     $this->userModel->markPasswordResetUsed($token);
                     $_SESSION['flash_success'] = 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập.';
-                    redirect('index.php?c=auth&a=login');
+                    redirect(url('auth', 'login'));
                 }
             }
 
@@ -227,6 +296,148 @@ class AuthController
     // HÀM GỬI EMAIL (giả lập - ghi ra file log)
     // Trong production: thay bằng PHPMailer / SMTP
     // ============================
+    private function generateOtp(): string
+    {
+        return (string)random_int(100000, 999999);
+    }
+
+    private function hashOtp(string $otp): string
+    {
+        return hash('sha256', $otp);
+    }
+
+    private function otpFromPost(): string
+    {
+        if (isset($_POST['otp']) && is_array($_POST['otp'])) {
+            return preg_replace('/\D+/', '', implode('', $_POST['otp']));
+        }
+
+        return preg_replace('/\D+/', '', (string)($_POST['otp'] ?? ''));
+    }
+
+    private function sendOtpEmail(string $email, string $name, string $otp): void
+    {
+        $logFile = __DIR__ . '/../../email_log.txt';
+        $subject = 'Mã OTP xác thực tài khoản ShopeeFake';
+        $body = "Xin chào {$name},\n\nMã OTP xác thực tài khoản ShopeeFake của bạn là: {$otp}\n\nMã có hiệu lực trong 5 phút.\n\nShopeeFake Team";
+        $from = $this->mailFromAddress();
+        $headers = [
+            "From: {$from}",
+            "Reply-To: {$from}",
+            'Content-Type: text/plain; charset=UTF-8',
+        ];
+
+        $mailTransportReady = $this->mailTransportReady();
+        $mailError = '';
+        $sent = false;
+
+        if ($mailTransportReady) {
+            $sent = $this->sendViaSmtp($email, $name, $subject, $body, $mailError);
+
+            if (!$sent) {
+                ini_set('sendmail_from', $from);
+                $sent = @mail($email, $subject, $body, implode("\r\n", $headers), "-f{$from}");
+                if (!$sent && $mailError === '') {
+                    $mailError = 'PHP mail() returned false.';
+                }
+            }
+        }
+
+        file_put_contents(
+            $logFile,
+            "[" . date('Y-m-d H:i:s') . "] OTP TO: {$email}\nMAIL_STATUS: " . ($sent ? 'SENT' : ($mailTransportReady ? 'FAILED' : 'SMTP_NOT_CONFIGURED')) . ($mailError ? "\nMAIL_ERROR: {$mailError}" : '') . "\nOTP: {$otp}\n{$body}\n\n",
+            FILE_APPEND
+        );
+    }
+
+    private function sendViaSmtp(string $email, string $name, string $subject, string $body, string &$error = ''): bool
+    {
+        $config = $this->sendmailConfig(ini_get('sendmail_path') ?: '');
+        if ($config === null) {
+            $error = 'sendmail.ini not found.';
+            return false;
+        }
+
+        $phpmailerClass = 'C:/laragon/etc/php/pear/PHPMailer/class.phpmailer.php';
+        $smtpClass = 'C:/laragon/etc/php/pear/PHPMailer/class.smtp.php';
+        if (!is_file($phpmailerClass) || !is_file($smtpClass)) {
+            $error = 'PHPMailer class files not found.';
+            return false;
+        }
+
+        require_once $phpmailerClass;
+        require_once $smtpClass;
+
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host = trim((string)($config['smtp_server'] ?? ''));
+            $mail->Port = (int)($config['smtp_port'] ?? 587);
+            $mail->SMTPSecure = strtolower((string)($config['smtp_ssl'] ?? 'tls'));
+            $mail->SMTPAuth = true;
+            $mail->Username = trim((string)($config['auth_username'] ?? ''));
+            $mail->Password = preg_replace('/\s+/', '', (string)($config['auth_password'] ?? ''));
+            $mail->CharSet = 'UTF-8';
+            $mail->isHTML(false);
+
+            $from = $this->mailFromAddress();
+            $mail->setFrom($from, 'ShopeeFake');
+            $mail->addAddress($email, $name);
+            $mail->Subject = $subject;
+            $mail->Body = $body;
+            $mail->send();
+            return true;
+        } catch (Throwable $e) {
+            $error = $mail->ErrorInfo ?: $e->getMessage();
+            return false;
+        }
+    }
+
+    private function mailTransportReady(): bool
+    {
+        $sendmailPath = ini_get('sendmail_path') ?: '';
+        $config = $this->sendmailConfig($sendmailPath);
+        if ($config === null) {
+            return true;
+        }
+
+        $server = trim((string)($config['smtp_server'] ?? ''));
+        $requiresAuth = stripos($server, 'gmail.com') !== false;
+        if (!$requiresAuth) {
+            return true;
+        }
+
+        return trim((string)($config['auth_username'] ?? '')) !== ''
+            && trim((string)($config['auth_password'] ?? '')) !== '';
+    }
+
+    private function mailFromAddress(): string
+    {
+        $config = $this->sendmailConfig(ini_get('sendmail_path') ?: '');
+        $username = trim((string)($config['auth_username'] ?? ''));
+
+        return filter_var($username, FILTER_VALIDATE_EMAIL) ? $username : 'noreply@shopeefake.local';
+    }
+
+    private function sendmailConfig(string $sendmailPath): ?array
+    {
+        if ($sendmailPath === '') {
+            return null;
+        }
+
+        if (!preg_match('/^(.+?sendmail\.exe)/i', $sendmailPath, $matches)) {
+            return null;
+        }
+
+        $iniPath = dirname(str_replace('/', DIRECTORY_SEPARATOR, $matches[1])) . DIRECTORY_SEPARATOR . 'sendmail.ini';
+        if (!is_file($iniPath)) {
+            return null;
+        }
+
+        $config = parse_ini_file($iniPath);
+        return $config ?: null;
+    }
+
     private function sendVerificationEmail(string $email, string $name, string $url): void
     {
         $subject = 'Xác thực tài khoản ShopeeFake';

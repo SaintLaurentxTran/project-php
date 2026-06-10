@@ -35,8 +35,36 @@ function loadController($className) {
     require_once $path;
 }
 
-$controller = $_GET['c'] ?? 'default';
-$action     = $_GET['a'] ?? 'home';
+$controller = $_GET['c'] ?? null;
+$action     = $_GET['a'] ?? null;
+
+if ($controller !== null && $action !== null && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+    $query = $_GET;
+    unset($query['c'], $query['a']);
+    header('Location: ' . url($controller, $action, $query), true, 301);
+    exit;
+}
+
+if ($controller === null || $action === null) {
+    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+    $basePath = rtrim(str_replace('/index.php', '', $_SERVER['SCRIPT_NAME'] ?? '/index.php'), '/');
+
+    if ($basePath !== '' && str_starts_with($requestPath, $basePath)) {
+        $requestPath = substr($requestPath, strlen($basePath));
+    }
+
+    $routePath = trim($requestPath, '/');
+    if ($routePath === 'index.php') {
+        $routePath = '';
+    }
+
+    $parts = array_values(array_filter(explode('/', $routePath), static fn($part) => $part !== ''));
+    $controller = $parts[0] ?? 'default';
+    $action = isset($parts[1]) ? route_action($parts[1]) : ($controller === 'default' ? 'home' : 'index');
+
+    $_GET['c'] = $controller;
+    $_GET['a'] = $action;
+}
 
 $controllerClass = ucfirst(strtolower($controller)) . 'Controller';
 

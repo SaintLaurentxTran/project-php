@@ -3,10 +3,10 @@
 <section class="container pt-32">
   <div class="seller-head">
     <h1>Thêm Sản Phẩm Mới</h1>
-    <a class="btn" href="index.php?c=seller&a=products">Quay lại</a>
+    <a class="btn" href="<?= e(url('seller', 'products')) ?>">Quay lại</a>
   </div>
 
-  <form class="grid2" method="POST" action="index.php?c=seller&a=store" enctype="multipart/form-data">
+  <form class="grid2" method="POST" action="<?= e(url('seller', 'store')) ?>" enctype="multipart/form-data">
     <div class="card">
       <h3>Thông tin cơ bản</h3>
 
@@ -36,26 +36,23 @@
       <h3>Giá & Tồn kho</h3>
       <div class="grid2">
         <div>
-          <label class="label">Giá (₫) *</label>
-          <input class="input" name="price" type="number" required value="199000"/>
+          <label class="label">Giá gốc (₫) *</label>
+          <input class="input" id="basePrice" name="base_price" type="number" min="0" required value="199000"/>
         </div>
         <div>
-          <label class="label">Giá cũ (₫)</label>
-          <input class="input" name="old_price" type="number" value=""/>
+          <label class="label">Giảm giá (%)</label>
+          <input class="input" id="discountPercent" name="discount_percent" type="number" min="0" max="100" value="0"/>
         </div>
       </div>
 
+      <p class="muted small mt-8">Giá sau giảm: <b id="discountedPricePreview">199.000₫</b></p>
+
       <div class="grid2 mt-8">
-        <div>
-          <label class="label">Giảm giá (%)</label>
-          <input class="input" name="discount_percent" type="number" value="0"/>
-        </div>
         <div>
           <label class="label">Tồn kho *</label>
           <input class="input" name="stock" type="number" required value="50"/>
         </div>
       </div>
-
       <label class="label mt-8">
         <input type="checkbox" name="is_flash_sale" value="1"> Flash Sale
       </label>
@@ -68,10 +65,27 @@
 
       <div class="row gap mt-16">
         <button class="btn btn-primary btn-lg" type="submit">Đăng sản phẩm</button>
-        <a class="btn btn-lg" href="index.php?c=seller&a=products">Hủy</a>
+        <a class="btn btn-lg" href="<?= e(url('seller', 'products')) ?>">Hủy</a>
       </div>
     </div>
   </form>
 </section>
 
+
+<script>
+  const basePriceInput = document.getElementById('basePrice');
+  const discountInput = document.getElementById('discountPercent');
+  const discountedPreview = document.getElementById('discountedPricePreview');
+
+  function updateDiscountedPreview() {
+    const basePrice = Math.max(0, Number(basePriceInput.value || 0));
+    const discount = Math.min(100, Math.max(0, Number(discountInput.value || 0)));
+    const discountedPrice = Math.round(basePrice * (100 - discount) / 100);
+    discountedPreview.textContent = discountedPrice.toLocaleString('vi-VN') + '₫';
+  }
+
+  basePriceInput.addEventListener('input', updateDiscountedPreview);
+  discountInput.addEventListener('input', updateDiscountedPreview);
+  updateDiscountedPreview();
+</script>
 <?php require __DIR__ . '/../shares/footer.php'; ?>

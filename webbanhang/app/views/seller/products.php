@@ -4,7 +4,10 @@
   <div class="seller-head">
     <h1>Seller Center • Product Management</h1>
     <div class="row gap">
-      <a class="btn btn-primary" href="index.php?c=seller&a=add">
+      <a class="btn" href="<?= e(url('seller', 'categories')) ?>">
+        <span class="material-symbols-outlined">category</span> Danh muc
+      </a>
+      <a class="btn btn-primary" href="<?= e(url('seller', 'add')) ?>">
         <span class="material-symbols-outlined">add_box</span> Thêm sản phẩm
       </a>
     </div>
@@ -28,20 +31,17 @@
         <div class="primary bold"><?= number_format((int)$p['price'], 0, ',', '.') ?>₫</div>
         <div><span class="pill pill-green">Active</span></div>
         <div class="right">
-          <a class="link" href="index.php?c=seller&a=edit&id=<?= (int)$p['id'] ?>">Sửa</a>
+          <a class="link" href="<?= e(url('seller', 'edit', ['id' => (int)$p['id']])) ?>">Sửa</a>
           <span class="muted">•</span>
-          <a class="link danger" href="index.php?c=seller&a=deleteConfirm&id=<?= (int)$p['id'] ?>">Xóa</a>
+          <a class="link danger" href="<?= e(url('seller', 'deleteConfirm', ['id' => (int)$p['id']])) ?>">Xóa</a>
         </div>
       </div>
     <?php endforeach; ?>
   </div>
 
   <div class="pagination">
-    <?php
-      $base = "index.php?c=seller&a=products&page=";
-      for ($i=1; $i <= $result['totalPages']; $i++):
-    ?>
-      <a class="pagebtn <?= ($i===$result['page'])?'active':'' ?>" href="<?= $base.$i ?>"><?= $i ?></a>
+    <?php for ($i=1; $i <= $result['totalPages']; $i++): ?>
+      <a class="pagebtn <?= ($i===$result['page'])?'active':'' ?>" href="<?= e(url('seller', 'products', ['page' => $i])) ?>"><?= $i ?></a>
     <?php endfor; ?>
   </div>
 </section>
