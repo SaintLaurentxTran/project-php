@@ -263,3 +263,80 @@ Link co hieu luc trong 1 gio. Neu ban khong yeu cau, vui long bo qua email nay.
 
 ShopeeFake Team
 
+[2026-06-14 21:50:03] OTP TO: levanluyen@example.com
+MAIL_STATUS: SENT
+OTP: 444964
+Xin chào le van luyen,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 444964
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-14 22:00:36] OTP TO: levanluyen@example.com
+MAIL_STATUS: SENT
+OTP: 634817
+Xin chào le van luyen,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 634817
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-15 05:47:30] OTP TO: kejajos292@hotkev.com
+MAIL_STATUS: SENT
+OTP: 413582
+Xin chào Nguyễn Hải Dương,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 413582
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-15 05:49:23] OTP TO: kejajos292@hotkev.com
+MAIL_STATUS: SENT
+OTP: 770332
+Xin chào Nguyễn Hải Dương,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 770332
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-15 05:49:43] OTP TO: kejajos292@hotkev.com
+MAIL_STATUS: SENT
+OTP: 340933
+Xin chào Nguyễn Hải Dương,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 340933
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-15 07:02:55] OTP TO: foxop39671@hotkev.com
+MAIL_STATUS: SENT
+OTP: 457151
+Xin chào Lão gà khô,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 457151
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+
+[2026-06-15 07:14:54] OTP TO: ticonuong@shopeefake.com
+MAIL_STATUS: SENT
+OTP: 907126
+Xin chào Tí cô nương,
+
+Mã OTP xác thực tài khoản ShopeeFake của bạn là: 907126
+
+Mã có hiệu lực trong 5 phút.
+
+ShopeeFake Team
+

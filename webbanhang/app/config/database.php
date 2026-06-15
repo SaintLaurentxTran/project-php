@@ -1,5 +1,4 @@
 <?php
-// Update these for Laragon
 $dbHost = '127.0.0.1';
 $dbName = 'shopeefake';
 $dbUser = 'root';
@@ -18,3 +17,6 @@ try {
   http_response_code(500);
   exit("DB connection failed: " . $e->getMessage());
 }
+
+define('JWT_SECRET', 'a7f9b2d4e8c156f3a9e2d7b4c6a8f1e0');
+define('JWT_TIME_TO_LIVE', 3600);

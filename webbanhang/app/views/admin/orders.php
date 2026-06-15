@@ -57,31 +57,49 @@
         <?php foreach ($result['orders'] as $order): ?>
           <tr>
             <td class="bold"><?= e($order['order_code']) ?></td>
+            
             <td>
               <div class="bold"><?= e($order['customer_name']) ?></div>
               <?php if (!empty($order['user_email'])): ?>
                 <div class="text-muted"><?= e($order['user_email']) ?></div>
               <?php endif; ?>
             </td>
+            
             <td><?= e($order['customer_phone']) ?></td>
+            
             <td class="bold primary"><?= money_vnd($order['total_amount']) ?></td>
-            <td><?= e($order['payment_method']) ?></td>
+            
+            <td>
+              <span class="bold" style="text-transform: uppercase; display: block; margin-bottom: 2px;"><?= e($order['payment_method']) ?></span>
+              <?php 
+                // Đồng bộ dữ liệu nếu database trả về trống (null) hoặc chưa đồng bộ cột
+                $checkStatus = isset($order['payment_status']) ? trim($order['payment_status']) : 'unpaid';
+                if ($checkStatus === 'paid'): 
+              ?>
+                <span style="color: #2ec4b6; font-size: 13px; font-weight: bold; display: inline-block;">● Đã thanh toán</span>
+              <?php else: ?>
+                <span style="color: #e71d36; font-size: 13px; font-weight: bold; display: inline-block;">● Chưa thanh toán</span>
+              <?php endif; ?>
+            </td>
+            
             <td>
               <form method="POST" action="<?= e(url('admin', 'updateOrderStatus')) ?>" class="status-form">
                 <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
                 <input type="hidden" name="order_id" value="<?= (int)$order['id'] ?>">
                 <input type="hidden" name="back" value="<?= e(url('admin', 'orders', ['page' => (int)$result['page'], 'q' => $_GET['q'] ?? '', 'status' => $_GET['status'] ?? ''])) ?>">
-                <select name="status" class="form-control status-select" onchange="this.form.submit()">
+                <select name="status" class="form-control status-select" onchange="this.form.submit()" style="padding: 4px 8px; border-radius: 4px;">
                   <?php foreach ($statusLabels as $key => $label): ?>
                     <option value="<?= e($key) ?>" <?= $order['status'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
                   <?php endforeach; ?>
                 </select>
               </form>
             </td>
+            
             <td><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></td>
+            
             <td>
               <a class="btn btn-info btn-sm" href="<?= e(url('admin', 'orderDetail', ['id' => (int)$order['id']])) ?>">
-                <span class="material-symbols-outlined">visibility</span> Xem
+                <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">visibility</span> Xem
               </a>
             </td>
           </tr>

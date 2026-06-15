@@ -58,7 +58,7 @@ class OrderModel {
     return $row ?: null;
   }
 
-  public function paginate(int $page = 1, int $perPage = 15, string $search = '', string $status = ''): array {
+  public function paginate(int $page = 1, int $perPage = 15, string $search = '', string $status = '', ?int $userId = null): array {
     $page = max(1, $page);
     $offset = ($page - 1) * $perPage;
     $where = [];
@@ -73,6 +73,12 @@ class OrderModel {
     if ($status !== '') {
       $where[] = "o.status = ?";
       $params[] = $status;
+    }
+
+    // 🔥 THÊM ĐIỀU KIỆN LỌC THEO USER ID NẾU CÓ TRUYỀN VÀO (Dành cho tài khoản quyền 'user')
+    if ($userId !== null) {
+      $where[] = "o.user_id = ?";
+      $params[] = $userId;
     }
 
     $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -138,5 +144,26 @@ class OrderModel {
     $st = $this->pdo->prepare("SELECT * FROM order_items WHERE order_id=?");
     $st->execute([$orderId]);
     return $st->fetchAll();
+  }
+
+  // Cập nhật trạng thái thanh toán của đơn hàng
+  public function updatePaymentStatus(int $orderId, string $paymentStatus): void {
+      $st = $this->pdo->prepare("UPDATE orders SET payment_status = ?, updated_at = NOW() WHERE id = ?");
+      $st->execute([$paymentStatus, $orderId]);
+  }
+
+  /**
+   * 🔥 SỬA ĐỔI: Hỗ trợ cập nhật cả Trạng thái đơn, Trạng thái thanh toán VÀ Phương thức thanh toán mới
+   */
+  public function updateOrderAndPaymentStatus(int $orderId, string $orderStatus, string $paymentStatus, string $paymentMethod = ''): void {
+      if (!empty($paymentMethod)) {
+          // Nếu có truyền phương thức thanh toán mới, thực hiện cập nhật toàn bộ 3 trường
+          $st = $this->pdo->prepare("UPDATE orders SET status = ?, payment_status = ?, payment_method = ?, updated_at = NOW() WHERE id = ?");
+          $st->execute([$orderStatus, $paymentStatus, $paymentMethod, $orderId]);
+      } else {
+          // Nếu không truyền phương thức thanh toán, chỉ cập nhật 2 trạng thái cũ
+          $st = $this->pdo->prepare("UPDATE orders SET status = ?, payment_status = ?, updated_at = NOW() WHERE id = ?");
+          $st->execute([$orderStatus, $paymentStatus, $orderId]);
+      }
   }
 }

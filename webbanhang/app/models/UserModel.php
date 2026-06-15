@@ -47,13 +47,16 @@ class UserModel
         )->execute([$userId]);
     }
 
-    // Cập nhật mật khẩu
-    public function updatePassword(int $userId, string $newPassword): void
+    /**
+     * Cập nhật mật khẩu mới (Mã hóa bằng password_hash)
+     */
+    public function updatePassword(int $userId, string $newPassword): bool
     {
-        $hash = password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 12]);
-        $this->pdo->prepare(
-            "UPDATE users SET password=?, updated_at=NOW() WHERE id=?"
-        )->execute([$hash, $userId]);
+        // Sử dụng thuật toán PASSWORD_BCRYPT chuẩn của PHP
+        $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+        
+        $stmt = $this->pdo->prepare("UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?");
+        return $stmt->execute([$hashedPassword, $userId]);
     }
 
     // Kiểm tra mật khẩu, đồng thời nâng cấp dữ liệu cũ về bcrypt nếu cần
@@ -83,12 +86,26 @@ class UserModel
         return false;
     }
 
-    // Cập nhật thông tin hồ sơ
-    public function updateProfile(int $userId, array $data): void
+    /**
+     * Cập nhật thông tin hồ sơ người dùng
+     */
+    public function updateProfile(int $id, string $name, string $phone, string $address, ?string $avatar = null): void 
     {
-        $this->pdo->prepare(
-            "UPDATE users SET name=?, phone=?, address=?, updated_at=NOW() WHERE id=?"
-        )->execute([$data['name'], $data['phone'] ?? null, $data['address'] ?? null, $userId]);
+        if ($avatar !== null) {
+            $st = $this->pdo->prepare("
+                UPDATE users 
+                SET name = ?, phone = ?, address = ?, avatar = ?, updated_at = NOW() 
+                WHERE id = ?
+            ");
+            $st->execute([$name, $phone, $address, $avatar, $id]);
+        } else {
+            $st = $this->pdo->prepare("
+                UPDATE users 
+                SET name = ?, phone = ?, address = ?, updated_at = NOW() 
+                WHERE id = ?
+            ");
+            $st->execute([$name, $phone, $address, $id]);
+        }
     }
 
     // Cập nhật avatar
@@ -168,32 +185,37 @@ class UserModel
         $this->pdo->prepare("DELETE FROM users WHERE id=?")->execute([$userId]);
     }
 
-    // ====== Password Reset ======
-
-    public function createPasswordReset(string $email, string $token): void
+    /**
+     * Mô phỏng lưu Token quên mật khẩu vào DB (Nếu bạn đã có bảng password_resets)
+     */
+    public function createPasswordReset(string $email, string $token): bool
     {
-        // Xóa token cũ
-        $this->pdo->prepare("DELETE FROM password_resets WHERE email=?")->execute([$email]);
-        // Tạo mới, hết hạn sau 1 giờ
-        $this->pdo->prepare(
-            "INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))"
-        )->execute([$email, $token]);
+        // Xóa token cũ của email này nếu có
+        $stmt = $this->pdo->prepare("DELETE FROM password_resets WHERE email = ?");
+        $stmt->execute([$email]);
+
+        // Lưu token mới, hết hạn sau 1 giờ
+        $stmt = $this->pdo->prepare("INSERT INTO password_resets (email, token, created_at, expires_at) VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 1 HOUR))");
+        return $stmt->execute([$email, $token]);
     }
 
+    /**
+     * Tìm token quên mật khẩu hợp lệ
+     */
     public function findPasswordReset(string $token): ?array
     {
-        $stmt = $this->pdo->prepare(
-            "SELECT * FROM password_resets WHERE token=? AND used=0 AND expires_at > NOW() LIMIT 1"
-        );
+        $stmt = $this->pdo->prepare("SELECT * FROM password_resets WHERE token = ? AND expires_at > NOW() LIMIT 1");
         $stmt->execute([$token]);
         return $stmt->fetch() ?: null;
     }
 
-    public function markPasswordResetUsed(string $token): void
+    /**
+     * Xóa token sau khi đã dùng xong
+     */
+    public function markPasswordResetUsed(string $token): bool
     {
-        $this->pdo->prepare(
-            "UPDATE password_resets SET used=1 WHERE token=?"
-        )->execute([$token]);
+        $stmt = $this->pdo->prepare("DELETE FROM password_resets WHERE token = ?");
+        return $stmt->execute([$token]);
     }
 
     // ====== Email Verification ======
@@ -262,4 +284,5 @@ class UserModel
             "UPDATE email_verifications SET used=1 WHERE user_id=? AND used=0"
         )->execute([$userId]);
     }
+    
 }

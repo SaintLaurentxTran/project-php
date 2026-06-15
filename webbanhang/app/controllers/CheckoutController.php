@@ -9,11 +9,6 @@ class CheckoutController {
   }
 
   public function index() {
-    $cartItems = $this->getCartItems();
-    if (count($cartItems) === 0) {
-      redirect(url('cart', 'index'));
-      return;
-    }
     $pageTitle = "ShopeeFake - Thanh toán";
     require __DIR__ . '/../views/checkout/index.php';
   }

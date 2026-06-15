@@ -15,8 +15,9 @@
       </div>
     <?php endif; ?>
 
-    <form method="POST" action="<?= e(url('auth', 'login')) ?>" novalidate>
+    <form method="POST" action="<?= e(url('auth', 'login')) ?>" data-api-login-form novalidate>
       <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
+      <div class="alert alert-error" data-api-message hidden></div>
 
       <div class="form-group">
         <label for="email">Email</label>

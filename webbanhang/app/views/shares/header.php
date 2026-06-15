@@ -1,10 +1,15 @@
 <?php
 require_once __DIR__ . '/../../core/helpers.php';
+
 $cartCount = 0;
 if (!empty($_SESSION['cart'])) {
-  foreach ($_SESSION['cart'] as $it) $cartCount += (int)$it['qty'];
+    foreach ($_SESSION['cart'] as $it) {
+        $cartCount += (int)$it['qty'];
+    }
 }
-$auth = currentUser();
+
+// 🔥 GIẢI PHÁP TRIỆT ĐỂ: Luôn ưu tiên đọc dữ liệu nóng nhất từ biến Session hệ thống
+$auth = $_SESSION['user'] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -17,7 +22,7 @@ $auth = currentUser();
   <link rel="stylesheet" href="<?= e(base_url('public/assets/styles.css')) ?>?v=<?= filemtime(__DIR__ . '/../../../public/assets/styles.css') ?>">
   <link rel="stylesheet" href="<?= e(base_url('public/assets/auth.css')) ?>?v=<?= filemtime(__DIR__ . '/../../../public/assets/auth.css') ?>">
 </head>
-<body>
+<body data-base-url="<?= e(base_url('/')) ?>" data-login-url="<?= e(url('auth', 'login')) ?>">
 
 <?php
 // Hiển thị flash messages
@@ -66,10 +71,12 @@ if ($flashSuccess || $flashError): ?>
       <div class="divider"></div>
 
       <?php if ($auth): ?>
-        <!-- Đã đăng nhập: hiển thị thông tin người dùng -->
         <div class="user-menu-wrap">
           <button class="user-menu-btn" id="userMenuBtn" type="button">
-            <img class="user-avatar-sm" src="<?= e(base_url(avatar_url($auth['avatar']))) ?>" alt="avatar">
+            <img class="user-avatar-sm" 
+                 src="<?= empty($auth['avatar']) ? '/public/assets/default_avatar.png' : '/public/uploads/avatars/' . e($auth['avatar']) . '?t=' . time() ?>" 
+                 alt="avatar"
+                 style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
             <span class="user-name-short"><?= e(mb_substr($auth['name'], 0, 15)) ?></span>
             <span class="material-symbols-outlined" style="font-size:18px">expand_more</span>
           </button>
@@ -77,7 +84,7 @@ if ($flashSuccess || $flashError): ?>
             <div class="user-dropdown-header">
               <div class="user-dropdown-name"><?= e($auth['name']) ?></div>
               <div class="user-dropdown-email"><?= e($auth['email']) ?></div>
-              <?php if ($auth['role'] === 'admin'): ?>
+              <?php if (isset($auth['role']) && $auth['role'] === 'admin'): ?>
                 <span class="role-badge role-admin">Admin</span>
               <?php else: ?>
                 <span class="role-badge role-user">Thành viên</span>
@@ -86,7 +93,7 @@ if ($flashSuccess || $flashError): ?>
             <a class="dropdown-item" href="<?= e(url('profile', 'index')) ?>">
               <span class="material-symbols-outlined">person</span> Hồ sơ cá nhân
             </a>
-            <?php if ($auth['role'] === 'admin'): ?>
+            <?php if (isset($auth['role']) && $auth['role'] === 'admin'): ?>
             <a class="dropdown-item" href="<?= e(url('admin', 'users')) ?>">
               <span class="material-symbols-outlined">manage_accounts</span> Quản lý người dùng
             </a>
@@ -103,13 +110,12 @@ if ($flashSuccess || $flashError): ?>
               </a>
             <?php endif; ?>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item dropdown-logout" href="<?= e(url('auth', 'logout')) ?>">
+            <a class="dropdown-item dropdown-logout" data-api-logout href="<?= e(url('auth', 'logout')) ?>">
               <span class="material-symbols-outlined">logout</span> Đăng Xuất
             </a>
           </div>
         </div>
       <?php else: ?>
-        <!-- Chưa đăng nhập -->
         <a class="link-btn" href="<?= e(url('auth', 'login')) ?>">Đăng Nhập</a>
         <a class="btn btn-primary" href="<?= e(url('auth', 'register')) ?>">Đăng Ký</a>
       <?php endif; ?>

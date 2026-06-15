@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/UserModel.php';
+require_once __DIR__ . '/../models/CartModel.php'; 
 require_once __DIR__ . '/../core/helpers.php';
 
 class AuthController
@@ -17,6 +18,16 @@ class AuthController
     public function register(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            
+            // 🔥 ĐỒNG BỘ JSON: Đọc dữ liệu nếu Postman gửi dạng JSON raw
+            $contentType = $_SERVER["CONTENT_TYPE"] ?? '';
+            $isApi = str_contains($_SERVER['REQUEST_URI'], '/api/');
+            if (stripos($contentType, 'application/json') !== false) {
+                $rawJson = file_get_contents('php://input');
+                $jsonData = json_decode($rawJson, true) ?? [];
+                $_POST = array_merge($_POST, $jsonData);
+            }
+
             csrf_check();
 
             $name     = trim($_POST['name'] ?? '');
@@ -39,8 +50,27 @@ class AuthController
                 $this->sendOtpEmail($email, $name, $otp);
                 $_SESSION['pending_verification_email'] = $email;
 
+                // 🔥 Xử lý phản hồi nếu là API gửi từ Postman
+                if ($isApi) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Đăng ký thành công! Vui lòng kiểm tra mã OTP trong hệ thống.',
+                        'email' => $email
+                    ]);
+                    return;
+                }
+
                 $_SESSION['flash_success'] = "Đăng ký thành công! Vui lòng nhập mã OTP đã gửi đến email.";
                 redirect(url('auth', 'verifyOtp', ['email' => $email]));
+            }
+
+            // 🔥 Trả về lỗi định dạng JSON nếu gọi qua API từ Postman
+            if ($isApi) {
+                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(400);
+                echo json_encode(['success' => false, 'errors' => $errors]);
+                return;
             }
 
             $pageTitle = 'Đăng Ký';
@@ -54,15 +84,25 @@ class AuthController
     }
 
     // ============================
-    // ĐĂNG NHẬP
+    // ĐĂNG NHẬP (TÍCH HỢP JWT)
     // ============================
     public function login(): void
     {
-        if (!empty($_SESSION['user'])) {
+        if (!empty($_SESSION['user']) && !str_contains($_SERVER['REQUEST_URI'], '/api/')) {
             redirect(url());
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            
+            // ĐỒNG BỘ JSON: Đọc dữ liệu nếu Postman gửi dạng JSON raw
+            $contentType = $_SERVER["CONTENT_TYPE"] ?? '';
+            $isApi = str_contains($_SERVER['REQUEST_URI'], '/api/');
+            if (stripos($contentType, 'application/json') !== false) {
+                $rawJson = file_get_contents('php://input');
+                $jsonData = json_decode($rawJson, true) ?? [];
+                $_POST = array_merge($_POST, $jsonData);
+            }
+
             csrf_check();
 
             $email    = trim($_POST['email'] ?? '');
@@ -75,10 +115,19 @@ class AuthController
             if (!$user || !$this->userModel->verifyPassword($user, $password)) {
                 $errors[] = 'Email hoặc mật khẩu không đúng.';
             } elseif (empty($user['email_verified_at'])) {
+                // (Giữ nguyên logic OTP cũ của bạn)
                 $otp = $this->generateOtp();
                 $this->userModel->createEmailOtp((int)$user['id'], $this->hashOtp($otp));
                 $this->sendOtpEmail($user['email'], $user['name'], $otp);
                 $_SESSION['pending_verification_email'] = $user['email'];
+
+                if ($isApi) {
+                    header('Content-Type: application/json; charset=utf-8');
+                    http_response_code(401);
+                    echo json_encode(['success' => false, 'message' => 'Tài khoản chưa kích hoạt. Vui lòng xác thực OTP.']);
+                    return;
+                }
+
                 $_SESSION['flash_error'] = 'Tài khoản chưa kích hoạt. Vui lòng nhập mã OTP vừa gửi đến email.';
                 redirect(url('auth', 'verifyOtp', ['email' => $user['email']]));
             } elseif (!$user['is_active']) {
@@ -86,13 +135,26 @@ class AuthController
             }
 
             if (!$errors) {
-                $_SESSION['user'] = [
-                    'id'     => $user['id'],
+                // Tạo mảng thông tin User tiêu chuẩn
+                $userData = [
+                    'id'     => (int)$user['id'],
                     'name'   => $user['name'],
                     'email'  => $user['email'],
                     'role'   => $user['role'],
                     'avatar' => $user['avatar'],
                 ];
+
+                // Lưu vào Session cho người dùng duyệt Web truyền thống
+                $_SESSION['user'] = $userData;
+
+                // ĐỒNG BỘ GIỎ HÀNG TỪ SESSION XUỐNG DATABASE
+                if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+                    $cartModel = new CartModel($this->pdo);
+                    foreach ($_SESSION['cart'] as $productId => $item) {
+                        $cartModel->addOrIncrement((int)$user['id'], (int)$productId, (int)$item['qty']);
+                    }
+                    unset($_SESSION['cart']);
+                }
 
                 // Remember Me
                 if ($remember) {
@@ -101,8 +163,43 @@ class AuthController
                     setcookie('remember_token', $token, time() + 60 * 60 * 24 * 30, '/', '', false, true);
                 }
 
+                // Remember Me
+                if ($remember) {
+                    $token = bin2hex(random_bytes(32));
+                    $this->userModel->setRememberToken($user['id'], $token);
+                    setcookie('remember_token', $token, time() + 60 * 60 * 24 * 30, '/', '', false, true);
+                }
+
+                // 🔥 ĐÃ SỬA: ĐỒNG BỘ HÓA GỌI QUA MIDDLEWARE ĐỂ TẠO TOKEN ĐỒNG NHẤT
+                if ($isApi) {
+                    // Gọi trực tiếp hàm tạo Token của Middleware để dùng chung cấu trúc 'data' và chung $secretKey
+                    $jwt = JwtMiddleware::generateToken($userData);
+
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode([
+                        'success'      => true,
+                        'message'      => 'Đăng nhập thành công!',
+                        'access_token' => $jwt,
+                        'token_type'   => 'Bearer',
+                        'expires_in'   => 86400, // 24 giờ khớp với Middleware
+                        'user'         => $userData
+                    ]);
+                    return;
+                }
+
                 $_SESSION['flash_success'] = "Chào mừng, {$user['name']}!";
                 redirect(url());
+
+                $_SESSION['flash_success'] = "Chào mừng, {$user['name']}!";
+                redirect(url());
+            }
+
+            // Trả về lỗi định dạng JSON nếu gọi đăng nhập thất bại qua API bằng Postman
+            if ($isApi) {
+                header('Content-Type: application/json; charset=utf-8');
+                http_response_code(400);
+                echo json_encode(['success' => false, 'errors' => $errors]);
+                return;
             }
 
             $pageTitle = 'Đăng Nhập';
@@ -116,6 +213,30 @@ class AuthController
     }
 
     // ============================
+    // LẤY THÔNG TIN NGƯỜI DÙNG HIỆN TẠI (API ME)
+    // ============================
+    public function me(): void
+    {
+        // Chỉ cho phép truy cập qua phương thức GET
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            header('HTTP/1.1 405 Method Not Allowed');
+            exit;
+        }
+
+        // Gọi hàm kiểm tra và lấy thông tin user từ JWT Token
+        $user = getJwtUser();
+
+        // Trả về thông tin user dưới dạng JSON
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => true,
+            'message' => 'Lấy thông tin người dùng thành công.',
+            'user' => $user
+        ]);
+        return;
+    }
+
+    // ============================
     // ĐĂNG XUẤT
     // ============================
     public function logout(): void
@@ -123,8 +244,14 @@ class AuthController
         if (!empty($_SESSION['user'])) {
             $this->userModel->clearRememberToken($_SESSION['user']['id']);
         }
+        
         setcookie('remember_token', '', time() - 3600, '/');
-        session_destroy();
+        
+        unset($_SESSION['user']);
+        unset($_SESSION['pending_verification_email']);
+        
+        $_SESSION['cart'] = []; 
+        
         redirect(url('auth', 'login'));
     }
 
@@ -234,7 +361,6 @@ class AuthController
                     $resetUrl = $this->absoluteUrl(url('auth', 'resetPassword', ['token' => $token]));
                     $this->sendPasswordResetLink($email, $user['name'], $resetUrl);
                 }
-                // Luôn hiện thông báo thành công (bảo mật - không tiết lộ email tồn tại)
                 $_SESSION['flash_success'] = 'Nếu email tồn tại, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu.';
                 redirect(url('auth', 'forgotPassword'));
             }
@@ -292,10 +418,6 @@ class AuthController
         require __DIR__ . '/../views/auth/reset_password.php';
     }
 
-    // ============================
-    // HÀM GỬI EMAIL (giả lập - ghi ra file log)
-    // Trong production: thay bằng PHPMailer / SMTP
-    // ============================
     private function generateOtp(): string
     {
         return (string)random_int(100000, 999999);
@@ -311,7 +433,6 @@ class AuthController
         if (isset($_POST['otp']) && is_array($_POST['otp'])) {
             return preg_replace('/\D+/', '', implode('', $_POST['otp']));
         }
-
         return preg_replace('/\D+/', '', (string)($_POST['otp'] ?? ''));
     }
 
@@ -457,12 +578,8 @@ class AuthController
         $subject = 'Xác thực tài khoản ShopeeFake';
         $body = "Xin chào {$name},\n\nVui lòng click vào link sau để xác thực tài khoản:\n{$url}\n\nLink hết hạn sau 24 giờ.\n\nShopeeFake Team";
 
-        // Ghi log thay vì gửi thật (môi trường development Laragon)
-        $logFile = __DIR__ . '/../../email_log.txt';
+        $logFile = __DIR__ . '/../..';
         file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] VERIFY TO: {$email}\nURL: {$url}\n\n", FILE_APPEND);
-
-        // Bỏ comment dòng dưới khi có SMTP thật:
-        // mail($email, $subject, $body, "From: noreply@shopeefake.com\r\nContent-Type: text/plain; charset=UTF-8");
     }
 
     private function sendPasswordResetLink(string $email, string $name, string $url): void
@@ -500,4 +617,250 @@ class AuthController
         );
     }
 
+    // ==========================================
+    // API CẬP NHẬT HỒ SƠ CÁ NHÂN VÀ ĐẠI DIỆN
+    // ==========================================
+    public function updateProfile(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!isset($_FILES['avatar'])) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Backend KHÔNG nhận được key avatar từ Postman.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        if ($_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'File lên tới server nhưng bị lỗi hệ thống. Mã lỗi (Error Code): ' . $_FILES['avatar']['error']
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $currentUser = JwtMiddleware::getAuthenticatedUser();
+        $userId = (int)$currentUser['id'];
+
+        $name    = trim($_POST['name'] ?? '');
+        $phone   = trim($_POST['phone'] ?? '');
+        $address = trim($_POST['address'] ?? '');
+
+        if (empty($name)) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Tên không được để trống.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $avatarName = null;
+        $fileTmpPath = $_FILES['avatar']['tmp_name'];
+        $fileName    = $_FILES['avatar']['name'];
+        
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (!in_array($fileExtension, $allowedExtensions, true)) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, GIF.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $avatarName = 'avatar_' . $userId . '_' . time() . '.' . $fileExtension;
+
+        $uploadFileDir = __DIR__ . '/../../public/uploads/avatars/';
+        if (!is_dir($uploadFileDir)) {
+            mkdir($uploadFileDir, 0755, true);
+        }
+
+        $destPath = $uploadFileDir . $avatarName;
+
+        if (!move_uploaded_file($fileTmpPath, $destPath)) {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Không thể lưu tập tin ảnh đại diện.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        // 5. CẬP NHẬT THÔNG TIN VÀO CƠ SỞ DỮ LIỆU
+        try {
+            $this->userModel->updateProfile($userId, $name, $phone, $address);
+
+            if ($avatarName !== null) {
+                $this->userModel->updateAvatar($userId, $avatarName);
+            }
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Cập nhật hồ sơ cá nhân và ảnh đại diện thành công!'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi lưu DB: ' . $e->getMessage()
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+    }
+
+    // =========================================================================
+    // 🔑 API 1: ĐỔI MẬT KHẨU (YÊU CẦU TOKEN ĐĂNG NHẬP)
+    // =========================================================================
+    public function apiChangePassword(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('HTTP/1.1 405 Method Not Allowed');
+            exit;
+        }
+
+        // 1. Xác thực người dùng qua JWT Token
+        $userPayload = getJwtUser(); 
+        $userId = (int)$userPayload['id'];
+
+        // 2. Đọc dữ liệu JSON thô từ Postman
+        $rawJson = file_get_contents('php://input');
+        $data = json_decode($rawJson, true) ?? [];
+
+        $oldPassword = $data['old_password'] ?? '';
+        $newPassword = $data['new_password'] ?? '';
+        $confirmPassword = $data['password_confirm'] ?? '';
+        $errors = [];
+
+        // 3. Kiểm tra dữ liệu hợp lệ
+        if (empty($oldPassword) || empty($newPassword)) {
+            $errors[] = 'Vui lòng điền đầy đủ mật khẩu cũ và mật khẩu mới.';
+        }
+        if (mb_strlen($newPassword) < 6) {
+            $errors[] = 'Mật khẩu mới phải từ 6 ký tự trở lên.';
+        }
+        if ($newPassword !== $confirmPassword) {
+            $errors[] = 'Xác nhận mật khẩu mới không trùng khớp.';
+        }
+
+        // 4. Kiểm tra mật khẩu cũ có đúng không
+        if (empty($errors)) {
+            $dbUser = $this->userModel->findByEmail($userPayload['email']);
+            // password_verify kiểm tra chuỗi mật khẩu thô so với chuỗi băm trong DB
+            if (!$dbUser || !password_verify($oldPassword, $dbUser['password'])) {
+                $errors[] = 'Mật khẩu cũ không chính xác.';
+            }
+        }
+
+        header('Content-Type: application/json; charset=utf-8');
+        if (!empty($errors)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'errors' => $errors]);
+            return;
+        }
+
+        // 5. Tiến hành đổi mật khẩu (Hàm updatePassword tự mã hóa bằng password_hash)
+        $this->userModel->updatePassword($userId, $newPassword);
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Thay đổi mật khẩu thành công!'
+        ]);
+    }
+
+    // =========================================================================
+    // 📩 API 2: QUÊN MẬT KHẨU (MÔ PHỎNG / KHÔNG CẦN TOKEN ĐĂNG NHẬP)
+    // =========================================================================
+    public function apiForgotPassword(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('HTTP/1.1 405 Method Not Allowed');
+            exit;
+        }
+
+        $rawJson = file_get_contents('php://input');
+        $data = json_decode($rawJson, true) ?? [];
+        $email = trim($data['email'] ?? '');
+
+        header('Content-Type: application/json; charset=utf-8');
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Email không đúng định dạng.']);
+            return;
+        }
+
+        $user = $this->userModel->findByEmail($email);
+        
+        // Tạo token khôi phục ngẫu nhiên (32 ký tự)
+        $token = bin2hex(random_bytes(16));
+        
+        if ($user) {
+            // Lưu token vào DB (nếu có bảng) hoặc bạn có thể mô phỏng trả về luôn
+            // Ở đây gọi hàm model để lưu thông tin reset
+            $this->userModel->createPasswordReset($email, $token);
+        }
+
+        // Vì đây là API mô phỏng/cơ bản, ta trả về token ngay trong JSON để dễ làm bài tập và test Postman 
+        // thay vì bắt buộc người dùng mở email_log.txt lên lấy.
+        echo json_encode([
+            'success' => true,
+            'message' => 'Yêu cầu khôi phục mật khẩu thành công. Hãy dùng mã token dưới đây để đặt lại mật khẩu mới.',
+            'simulated_token' => $token,
+            'note' => 'Trong thực tế, token này sẽ được đính kèm vào link gửi trực tiếp tới email người dùng.'
+        ]);
+    }
+
+    // =========================================================================
+    // 🔄 API 3: ĐẶT LẠI MẬT KHẨU MỚI TỪ TOKEN (KHÔNG CẦN TOKEN ĐĂNG NHẬP)
+    // =========================================================================
+    public function apiResetPassword(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('HTTP/1.1 405 Method Not Allowed');
+            exit;
+        }
+
+        $rawJson = file_get_contents('php://input');
+        $data = json_decode($rawJson, true) ?? [];
+
+        $token = trim($data['token'] ?? '');
+        $newPassword = $data['password'] ?? '';
+        $confirmPassword = $data['password_confirm'] ?? '';
+        $errors = [];
+
+        if (empty($token)) $errors[] = 'Mã Token khôi phục mật khẩu là bắt buộc.';
+        if (mb_strlen($newPassword) < 6) $errors[] = 'Mật khẩu mới phải từ 6 ký tự trở lên.';
+        if ($newPassword !== $confirmPassword) $errors[] = 'Xác nhận mật khẩu không trùng khớp.';
+
+        // Xác thực Token xem có tồn tại hoặc hết hạn hay không
+        $resetRecord = null;
+        if (empty($errors)) {
+            $resetRecord = $this->userModel->findPasswordReset($token);
+            if (!$resetRecord) {
+                $errors[] = 'Mã Token không hợp lệ hoặc đã hết hạn (Hiệu lực 1 giờ).';
+            }
+        }
+
+        header('Content-Type: application/json; charset=utf-8');
+        if (!empty($errors)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'errors' => $errors]);
+            return;
+        }
+
+        // Lấy thông tin user dựa vào email từ bản ghi token
+        $user = $this->userModel->findByEmail($resetRecord['email']);
+        if ($user) {
+            // Tiến hành cập nhật mật khẩu mới (Mã hóa bằng password_hash)
+            $this->userModel->updatePassword((int)$user['id'], $newPassword);
+            // Xóa mã token này đi để tránh dùng lại lần 2
+            $this->userModel->markPasswordResetUsed($token);
+        }
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Đặt lại mật khẩu mới thành công! Bạn có thể sử dụng mật khẩu này để đăng nhập.'
+        ]);
+    }
 }

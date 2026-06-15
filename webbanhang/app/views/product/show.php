@@ -1,18 +1,18 @@
 <?php require __DIR__ . '/../shares/header.php'; ?>
 
-<section class="container pt-32">
+<section class="container pt-32" data-api-product-detail="<?= (int)$product['id'] ?>">
   <nav class="breadcrumb">
     <a href="<?= e(url()) ?>">Trang chủ</a>
     <span class="material-symbols-outlined">chevron_right</span>
     <a href="<?= e(url('default', 'search', ['category_id' => (int)$product['category_id']])) ?>"><?= htmlspecialchars($product['category_name']) ?></a>
     <span class="material-symbols-outlined">chevron_right</span>
-    <span class="truncate"><?= htmlspecialchars($product['name']) ?></span>
+    <span class="truncate" data-api-detail-breadcrumb><?= htmlspecialchars($product['name']) ?></span>
   </nav>
 
   <div class="card product-hero">
     <div class="gallery">
       <div class="mainimg">
-        <img id="mainProductImage" src="<?= htmlspecialchars($product['thumb_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+        <img id="mainProductImage" data-api-detail-image src="<?= htmlspecialchars($product['thumb_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
       </div>
       <div class="thumbs">
         <button class="thumb active" type="button" data-src="<?= htmlspecialchars($product['thumb_url']) ?>">
@@ -32,7 +32,7 @@
     </div>
 
     <div class="info">
-      <h1 class="pdetail-title">
+      <h1 class="pdetail-title" data-api-detail-title>
         <?php if ((int)$product['is_flash_sale'] === 1): ?>
           <span class="pill pill-green">FLASH</span>
         <?php endif; ?>
@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <form class="buybox" method="POST" action="<?= e(url('cart', 'add')) ?>">
+      <form class="buybox" method="POST" action="<?= e(url('cart', 'add')) ?>" data-api-add-cart>
         <input type="hidden" name="id" value="<?= (int)$product['id'] ?>">
         <div class="qty">
           <button class="qtybtn" type="button" data-qty="-1">-</button>

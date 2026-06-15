@@ -33,11 +33,14 @@ class ProductModel {
     $where = [];
     $params = [];
 
+    // Lọc theo từ khóa tìm kiếm (q)
     if (!empty($filters['q'])) {
       $where[] = "(p.name LIKE ? OR p.description LIKE ?)";
       $params[] = '%' . $filters['q'] . '%';
       $params[] = '%' . $filters['q'] . '%';
     }
+    
+    // Lọc theo danh mục
     if (!empty($filters['category_id'])) {
       $where[] = "p.category_id = ?";
       $params[] = (int)$filters['category_id'];
@@ -45,32 +48,55 @@ class ProductModel {
 
     $whereSql = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
 
+    // ==========================================================
+    // 🔥 XỬ LÝ SẮP XẾP ĐỘNG (GIÁ TĂNG / GIÁ GIẢM / MỚI NHẤT)
+    // ==========================================================
+    $orderSql = "ORDER BY p.created_at DESC"; // Mặc định nếu không truyền gì sẽ là mới nhất
+    
+    if (!empty($filters['sort_by'])) {
+        switch ($filters['sort_by']) {
+            case 'price_asc':
+                $orderSql = "ORDER BY p.price ASC";
+                break;
+            case 'price_desc':
+                $orderSql = "ORDER BY p.price DESC";
+                break;
+            case 'oldest':
+                $orderSql = "ORDER BY p.created_at ASC";
+                break;
+        }
+    }
+
+    // Đếm tổng số lượng bản ghi
     $countSt = $this->pdo->prepare("SELECT COUNT(*) AS cnt FROM products p {$whereSql}");
     $countSt->execute($params);
     $total = (int)$countSt->fetch()['cnt'];
 
     $offset = ($page - 1) * $perPage;
 
+    // Đưa biến $orderSql động vào câu lệnh SQL thực thi thay vì fix cứng created_at DESC
     $sql = "
       SELECT p.*, c.name AS category_name
       FROM products p
       JOIN categories c ON c.id = p.category_id
       {$whereSql}
-      ORDER BY p.created_at DESC
+      {$orderSql} 
       LIMIT ? OFFSET ?
     ";
+    
     $st = $this->pdo->prepare($sql);
     
-    // Bind các tham số search (nếu có)
+    // Bind các tham số search/category
     foreach ($params as $index => $value) {
         $st->bindValue($index + 1, $value);
     }
+    
     // Bind tham số phân trang dưới dạng INT
     $st->bindValue(count($params) + 1, $perPage, PDO::PARAM_INT);
     $st->bindValue(count($params) + 2, $offset, PDO::PARAM_INT);
     
     $st->execute();
-    $items = $st->fetchAll();
+    $items = $st->fetchAll(PDO::FETCH_ASSOC); // Thêm FETCH_ASSOC cho JSON sạch đẹp
 
     return [
       'items' => $items,
@@ -153,7 +179,9 @@ class ProductModel {
   }
 
   private function calculatePricing(array $data): array {
-    $basePrice = (int)($data['base_price'] ?? $data['old_price'] ?? $data['price'] ?? 0);
+    // Đảo $data['price'] lên trước $data['old_price'] để ưu tiên nhận giá mới từ Postman
+    $basePrice = (int)($data['base_price'] ?? $data['price'] ?? $data['old_price'] ?? 0);
+    
     $basePrice = max(0, $basePrice);
     $discountPercent = (int)($data['discount_percent'] ?? 0);
     $discountPercent = max(0, min(100, $discountPercent));
@@ -164,7 +192,7 @@ class ProductModel {
       'old_price' => $discountPercent > 0 ? $basePrice : null,
       'discount_percent' => $discountPercent,
     ];
-  }
+}
 
   public function delete(int $id): void {
     $this->pdo->prepare("DELETE FROM product_images WHERE product_id=?")->execute([$id]);

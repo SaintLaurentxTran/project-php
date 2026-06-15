@@ -67,7 +67,12 @@ function csrf_token(): string {
     return $_SESSION['_csrf'];
 }
 
+// 🔥 ĐÃ CẬP NHẬT: Tự động bỏ qua CSRF nếu request gửi lên từ API / Postman dạng JSON
 function csrf_check(): void {
+    if (isset($_SERVER['CONTENT_TYPE']) && stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+        return; 
+    }
+
     $token = $_POST['_csrf'] ?? '';
     if (!$token || !isset($_SESSION['_csrf']) || !hash_equals($_SESSION['_csrf'], $token)) {
         http_response_code(419);
@@ -106,11 +111,13 @@ function requireAdmin(): void {
     }
 }
 
-function avatar_url(?string $avatar): string {
-    if ($avatar && file_exists(__DIR__ . '/../../' . $avatar)) {
-        return $avatar;
+function avatar_url(?string $avatarName): string 
+{
+    if (empty($avatarName)) {
+        return 'public/assets/default_avatar.png';
     }
-    return 'public/assets/default_avatar.png';
+    
+    return 'public/uploads/avatars/' . $avatarName;
 }
 
 function flash(string $type = 'success'): ?string {
@@ -121,4 +128,37 @@ function flash(string $type = 'success'): ?string {
         return $msg;
     }
     return null;
+}
+
+
+function getJwtUser(): array {
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    
+    // Kiểm tra cấu trúc định dạng "Bearer <token>"
+    if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+        header('Content-Type: application/json; charset=utf-8');
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Token không được cung cấp hoặc sai định dạng.']);
+        exit;
+    }
+
+    $jwt = $matches[1];
+
+    try {
+        // Tiến hành giải mã Token bằng Secret Key và thuật toán HS256
+        $decoded = \Firebase\JWT\JWT::decode($jwt, new \Firebase\JWT\Key(JWT_SECRET, 'HS256'));
+        
+        // Chuyển đối tượng stdClass thành mảng (array)
+        return (array) $decoded->user;
+    } catch (\Firebase\JWT\ExpiredException $e) {
+        header('Content-Type: application/json; charset=utf-8');
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Token đã hết hạn sử dụng.']);
+        exit;
+    } catch (\Exception $e) {
+        header('Content-Type: application/json; charset=utf-8');
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Token không hợp lệ: ' . $e->getMessage()]);
+        exit;
+    }
 }

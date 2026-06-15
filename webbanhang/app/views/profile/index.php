@@ -8,7 +8,9 @@
             <!-- Bên trái: Avatar -->
             <div style="flex: 1; min-width: 200px; text-align: center;">
                 <div class="mb-3">
-                    <img src="<?= e(base_url(avatar_url($user['avatar']))) ?>" alt="Avatar" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid #ee4d2d; display: block; margin: 0 auto;">
+                    <img src="<?= empty($user['avatar']) ? '/public/assets/default_avatar.png' : '/public/uploads/avatars/' . e($user['avatar']) ?>" 
+                    alt="Avatar" 
+                    style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid #ee4d2d; display: block; margin: 0 auto;">
                 </div>
                 <form action="<?= e(url('profile', 'uploadAvatar')) ?>" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">

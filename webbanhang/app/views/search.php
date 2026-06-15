@@ -47,7 +47,9 @@
         </div>
       </div>
 
-      <div class="grid grid-5">
+      <div class="api-status" data-api-product-status>Dang tai san pham tu API...</div>
+
+      <div class="grid grid-5" data-api-product-list data-api-search="<?= e($q ?? '') ?>" data-api-category-id="<?= (int)($category_id ?? 0) ?>">
         <?php foreach ($result['items'] as $p): ?>
           <a class="product-card hover-lift" href="<?= e(url('product', 'show', ['id' => (int)$p['id']])) ?>">
             <div class="pimg">
@@ -74,7 +76,7 @@
         <?php endforeach; ?>
       </div>
 
-      <div class="pagination">
+      <div class="pagination" data-api-product-pagination>
         <?php $pageUrl = fn($page) => url('default', 'search', ['q' => $q, 'category_id' => (int)$category_id, 'page' => $page]); ?>
         <a class="pagebtn" href="<?= e($pageUrl(max(1, $result['page']-1))) ?>">&laquo;</a>
         <?php for ($i=1; $i <= $result['totalPages']; $i++): ?>

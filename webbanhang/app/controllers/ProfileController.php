@@ -25,7 +25,22 @@ class ProfileController
     // ============================
     public function index(): void
     {
+        // 1. Lấy dữ liệu mới nhất từ database
         $user = $this->userModel->findById((int)$_SESSION['user']['id']);
+        
+        // 2. Ép Session phải ghi đè lại dữ liệu vừa bốc từ Database lên
+        if ($user) {
+            $_SESSION['user'] = [
+                'id'      => $user['id'],
+                'name'    => $user['name'],
+                'email'   => $user['email'],
+                'phone'   => $user['phone'] ?? '',
+                'address' => $user['address'] ?? '',
+                'avatar'  => $user['avatar'] ?? '',
+                'role'    => $user['role'] ?? 'user'
+            ];
+        }
+
         $pageTitle = 'Hồ Sơ Cá Nhân';
         require __DIR__ . '/../views/profile/index.php';
     }
@@ -38,6 +53,7 @@ class ProfileController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect(url('profile', 'index'));
         }
+        
         csrf_check();
 
         $name    = trim($_POST['name'] ?? '');
@@ -45,13 +61,19 @@ class ProfileController
         $address = trim($_POST['address'] ?? '');
         $errors  = [];
 
-        if (mb_strlen($name) < 2) $errors[] = 'Họ tên phải ít nhất 2 ký tự.';
+        if (mb_strlen($name) < 2) {
+            $errors[] = 'Họ tên phải ít nhất 2 ký tự.';
+        }
 
         if (!$errors) {
             $userId = (int)$_SESSION['user']['id'];
-            $this->userModel->updateProfile($userId, compact('name', 'phone', 'address'));
-            // Cập nhật session
-            $_SESSION['user']['name'] = $name;
+
+            $this->userModel->updateProfile($userId, $name, $phone, $address);
+
+            $_SESSION['user']['name']    = $name;
+            $_SESSION['user']['phone']   = $phone;
+            $_SESSION['user']['address'] = $address;
+            
             $_SESSION['flash_success'] = 'Cập nhật hồ sơ thành công!';
             redirect(url('profile', 'index'));
         }
@@ -103,55 +125,44 @@ class ProfileController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect(url('profile', 'index'));
         }
+
         csrf_check();
 
         $userId = (int)$_SESSION['user']['id'];
-        $errors = [];
 
-        if (empty($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
-            $errors[] = 'Vui lòng chọn file ảnh.';
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $fileTmpPath = $_FILES['avatar']['tmp_name'];
+            $fileName    = $_FILES['avatar']['name'];
+            
+            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+            if (!in_array($fileExtension, $allowedExtensions, true)) {
+                $_SESSION['flash_error'] = 'Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, GIF.';
+                redirect(url('profile', 'index'));
+            }
+
+            $avatarName = 'avatar_' . $userId . '_' . time() . '.' . $fileExtension;
+
+            $uploadFileDir = __DIR__ . '/../../public/uploads/avatars/';
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0755, true);
+            }
+
+            $destPath = $uploadFileDir . $avatarName;
+
+            if (move_uploaded_file($fileTmpPath, $destPath)) {
+                
+                $this->userModel->updateAvatar($userId, $avatarName);
+
+                $_SESSION['user']['avatar'] = $avatarName;
+
+                $_SESSION['flash_success'] = 'Cập nhật ảnh đại diện thành công!';
+            } else {
+                $_SESSION['flash_error'] = 'Không thể lưu tập tin ảnh đại diện lên máy chủ.';
+            }
         } else {
-            $file     = $_FILES['avatar'];
-            $maxSize  = 2 * 1024 * 1024; // 2MB
-            $allowed  = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            $finfo    = new finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->file($file['tmp_name']);
-
-            if ($file['size'] > $maxSize) {
-                $errors[] = 'File quá lớn. Tối đa 2MB.';
-            } elseif (!in_array($mimeType, $allowed)) {
-                $errors[] = 'Chỉ chấp nhận ảnh JPG, PNG, GIF, WEBP.';
-            }
-
-            if (!$errors) {
-                $ext      = pathinfo($file['name'], PATHINFO_EXTENSION);
-                $filename = 'avatar_' . $userId . '_' . time() . '.' . strtolower($ext);
-                $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
-
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0755, true);
-                }
-
-                // Xóa avatar cũ nếu có
-                $oldUser = $this->userModel->findById($userId);
-                if ($oldUser['avatar'] && file_exists(__DIR__ . '/../../' . $oldUser['avatar'])) {
-                    unlink(__DIR__ . '/../../' . $oldUser['avatar']);
-                }
-
-                $destPath = $uploadDir . $filename;
-                if (move_uploaded_file($file['tmp_name'], $destPath)) {
-                    $dbPath = 'public/uploads/avatars/' . $filename;
-                    $this->userModel->updateAvatar($userId, $dbPath);
-                    $_SESSION['user']['avatar'] = $dbPath;
-                    $_SESSION['flash_success'] = 'Cập nhật ảnh đại diện thành công!';
-                } else {
-                    $errors[] = 'Không thể lưu file. Kiểm tra quyền thư mục.';
-                }
-            }
-        }
-
-        if ($errors) {
-            $_SESSION['flash_error'] = implode('<br>', $errors);
+            $_SESSION['flash_error'] = 'Vui lòng chọn một tập tin ảnh hợp lệ.';
         }
 
         redirect(url('profile', 'index'));

@@ -55,6 +55,11 @@ img{max-width:100%;display:block}
 .link{color:var(--primary);font-weight:800}
 .link:hover{text-decoration:underline}
 .link.danger{color:var(--danger)}
+.api-link-button{border:none;background:transparent;padding:0;cursor:pointer;font:inherit}
+.api-status{margin:10px 0;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;color:var(--muted);font-weight:700}
+.api-status[hidden]{display:none}
+.api-status-success{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.08);color:#047857}
+.api-status-error{border-color:rgba(186,26,26,.25);background:rgba(186,26,26,.08);color:var(--danger)}
 
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 6px 18px rgba(15,23,42,.05);padding:18px}
 .card-inner{border-top:1px solid var(--border);padding-top:14px;margin-top:14px}
